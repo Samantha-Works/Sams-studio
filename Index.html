@@ -1,537 +1,3346 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-/>
-<title>Sam's Builder — by SRL</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <!--
+    SAM'S BUILDER — by S.R.Langlois
+    Copyright © 2026 SRL. All rights reserved.
+  -->
+  <title>Sam's Builder — by SRL</title>
+  <style>
+:root{--font-sans:'Segoe UI','Inter',system-ui,-apple-system,sans-serif;--font-mono:'Cascadia Code','JetBrains Mono','Consolas','Courier New',monospace;}
+/* ============================================================
+   SAM'S BUILDER — by S.R.Langlois
+   Copyright © 2026 SRL - S.R.Langlois. All rights reserved.
+   Responsive redesign — mobile-first, no squishing
+   ============================================================ */
 
-<style>
-:root{
-  --bg:#070b14;
-  --bg2:#111827;
-  --panel:#151b2b;
-  --border:rgba(255,255,255,.08);
-  --text:#ffffff;
-  --muted:#a1a1aa;
-  --purple1:#8b5cf6;
-  --purple2:#c084fc;
+:root {
+  --bg-0: #0d0f12;
+  --bg-1: #13161b;
+  --bg-2: #1a1e25;
+  --bg-3: #222731;
+  --border: #2a2f3a;
+  --text-0: #f0f2f5;
+  --text-1: #b0b7c3;
+  --text-2: #6b7280;
+  --accent: #a855f7;
+  --accent-2: #c084fc;
+  --accent-glow: rgba(168,85,247,0.25);
+  --green: #22c55e;
+  --red: #ef4444;
+  --blue: #3b82f6;
+  --yellow: #eab308;
+  --teal: #14b8a6;
+  --gold: #f59e0b;
+  --font-mono: 'Cascadia Code','JetBrains Mono','Fira Code','Consolas',monospace;
+  --font-sans: 'Segoe UI','Inter',system-ui,-apple-system,sans-serif;
+  --radius: 10px;
+  --sidebar-w: 260px;
+  --header-h: 56px;
 }
 
-*{
-  box-sizing:border-box;
-  -webkit-tap-highlight-color:transparent;
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+body { font-family: var(--font-sans); background: var(--bg-0); color: var(--text-0); }
+
+/* =====================================================================
+   APP SHELL — Sidebar + Main area
+   ===================================================================== */
+#app { display: flex; height: 100vh; position: relative; }
+
+/* =====================================================================
+   SIDEBAR
+   ===================================================================== */
+#sidebar {
+  width: var(--sidebar-w);
+  background: var(--bg-1);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow: hidden;
+  transition: transform .25s ease, width .25s ease;
+  z-index: 50;
 }
 
-html,
-body{
-  margin:0;
-  padding:0;
-  width:100%;
-  height:100%;
-  overflow:hidden;
-  background:var(--bg);
-  color:var(--text);
-  font-family:Inter,Arial,sans-serif;
+/* Sidebar header */
+.sidebar-header {
+  padding: 18px 18px 14px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.logo { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.logo-icon { font-size: 24px; }
+.logo-text { font-size: 17px; font-weight: 800; color: var(--accent); letter-spacing: .5px; }
+.logo-sub  { font-size: 10px; color: var(--text-2); margin-top: 2px; letter-spacing: .3px; }
+.copyright-badge {
+  font-size: 10px; color: var(--gold);
+  background: rgba(245,158,11,0.08);
+  border: 1px solid rgba(245,158,11,0.2);
+  border-radius: 6px; padding: 3px 8px;
+  margin-top: 6px; display: inline-block;
+}
+.ai-status { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-2); margin-top: 8px; flex-wrap: wrap; gap: 4px; }
+.status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-2); flex-shrink: 0; transition: background .3s; }
+.status-dot.online  { background: var(--green); }
+.status-dot.offline { background: var(--red); }
+.status-dot.warn    { background: var(--yellow); }
+
+/* Build button in sidebar */
+.sidebar-build-btn {
+  margin: 12px 18px 0;
+  width: calc(100% - 36px);
+  padding: 10px;
+  background: linear-gradient(135deg, var(--accent), #7c3aed);
+  color: white; border: none; border-radius: var(--radius);
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  font-family: var(--font-sans); letter-spacing: .3px;
+  transition: opacity .15s;
+}
+.sidebar-build-btn:hover { opacity: .88; }
+
+/* Nav */
+.sidebar-nav { padding: 12px 10px; display: flex; flex-direction: column; gap: 3px; flex: 1; overflow-y: auto; }
+.nav-btn {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 12px; border-radius: var(--radius); border: none;
+  background: transparent; color: var(--text-1); font-size: 14px;
+  font-family: var(--font-sans); cursor: pointer; width: 100%; text-align: left;
+  transition: all .15s; position: relative;
+}
+.nav-btn:hover  { background: var(--bg-2); color: var(--text-0); }
+.nav-btn.active { background: rgba(168,85,247,0.12); color: var(--accent); font-weight: 500; }
+.nav-btn .nav-badge {
+  margin-left: auto; background: var(--accent); color: white;
+  font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 10px; letter-spacing: .3px;
+}
+.nav-sep { height: 1px; background: var(--border); margin: 6px 12px; }
+
+/* Model selectors */
+.model-selector { padding: 12px 18px; border-top: 1px solid var(--border); flex-shrink: 0; }
+.model-selector label {
+  display: block; font-size: 10px; text-transform: uppercase;
+  letter-spacing: .6px; color: var(--text-2); margin-bottom: 5px; margin-top: 10px;
+}
+.model-selector label:first-child { margin-top: 0; }
+.model-selector select {
+  width: 100%; background: var(--bg-2); border: 1px solid var(--border);
+  color: var(--text-0); padding: 8px 10px; border-radius: 8px;
+  font-size: 12px; cursor: pointer; font-family: var(--font-sans); outline: none;
 }
 
-body{
-  display:flex;
-  flex-direction:column;
-  height:100dvh;
+/* Project context */
+.project-context { padding: 10px 18px; border-top: 1px solid var(--border); flex-shrink: 0; }
+.project-context label { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: .5px; color: var(--text-2); margin-bottom: 4px; }
+.active-project-name { font-size: 12px; color: var(--accent); font-weight: 500; font-family: var(--font-mono); }
+
+/* Offline badge */
+.offline-badge {
+  padding: 8px 18px; border-top: 1px solid var(--border);
+  font-size: 10px; color: var(--teal); text-align: center;
+  background: rgba(20,184,166,.04); flex-shrink: 0;
 }
 
-/* HEADER */
+/* =====================================================================
+   MAIN CONTENT AREA
+   ===================================================================== */
+#main { flex: 1; overflow: hidden; display: flex; flex-direction: column; min-width: 0; position: relative; }
 
-.header{
-  height:72px;
-  flex-shrink:0;
+/* =====================================================================
+   TOPBAR (mobile hamburger + panel title)
+   ===================================================================== */
+#topbar {
+  display: none; /* hidden on desktop */
+  align-items: center; gap: 12px;
+  padding: 0 16px;
+  height: var(--header-h);
+  background: var(--bg-1);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  z-index: 40;
+}
+#hamburger-btn {
+  width: 36px; height: 36px; border-radius: 8px;
+  background: var(--bg-2); border: 1px solid var(--border);
+  color: var(--text-0); font-size: 18px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+#topbar-title { font-size: 15px; font-weight: 600; flex: 1; color: var(--text-0); }
+#topbar-logo  { font-size: 13px; font-weight: 700; color: var(--accent); }
 
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
+/* =====================================================================
+   PANELS
+   ===================================================================== */
+.panel { display: none; flex-direction: column; height: 100%; position: relative; overflow: hidden; }
+.panel.active { display: flex; }
+.panel-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px; border-bottom: 1px solid var(--border);
+  background: var(--bg-1); flex-shrink: 0; gap: 10px;
+}
+.panel-header h2 { font-size: 16px; font-weight: 700; white-space: nowrap; }
+.header-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 
-  padding:0 16px;
+/* =====================================================================
+   DROP OVERLAY
+   ===================================================================== */
+.drop-overlay {
+  position: absolute; inset: 0; background: rgba(13,15,18,.93);
+  border: 2px dashed var(--accent); display: none;
+  flex-direction: column; align-items: center; justify-content: center;
+  z-index: 100; gap: 14px; pointer-events: none;
+}
+.drop-overlay.visible { display: flex; }
+.drop-icon { font-size: 60px; }
+.drop-text { font-size: 22px; font-weight: 700; color: var(--accent); }
+.drop-sub  { font-size: 14px; color: var(--text-2); }
 
-  border-bottom:1px solid var(--border);
+/* =====================================================================
+   CHAT & BUILD PANEL — builder-split layout
+   ===================================================================== */
+.builder-split { display: flex; flex: 1; overflow: hidden; }
+.builder-chat-side { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.builder-preview-side {
+  width: 420px; flex-shrink: 0; display: flex; flex-direction: column;
+  background: var(--bg-0); border-left: 1px solid var(--border);
+}
+.preview-header {
+  padding: 12px 16px; background: var(--bg-1); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+}
+.preview-header span { font-size: 12px; color: var(--text-2); }
+.preview-title  { font-size: 13px; font-weight: 600; color: var(--text-1); }
+.preview-frame-wrap { flex: 1; overflow: hidden; position: relative; }
+.preview-frame  { width: 100%; height: 100%; border: none; background: white; }
+.preview-placeholder {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 100%; gap: 14px; color: var(--text-2);
+}
+.preview-placeholder-icon { font-size: 52px; }
+.preview-placeholder p    { font-size: 14px; }
+.preview-tabs { display: flex; background: var(--bg-1); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.preview-tab {
+  padding: 8px 16px; font-size: 12px; cursor: pointer; border: none;
+  background: transparent; color: var(--text-2); font-family: var(--font-sans);
+  border-bottom: 2px solid transparent; transition: all .15s; white-space: nowrap;
+}
+.preview-tab:hover  { color: var(--text-0); }
+.preview-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-  background:linear-gradient(
-    to bottom,
-    #0b1020,
-    #070b14
-  );
+/* =====================================================================
+   CHAT MESSAGES
+   ===================================================================== */
+.chat-messages {
+  flex: 1; overflow-y: auto; padding: 20px 16px;
+  display: flex; flex-direction: column; gap: 16px;
+  background: var(--bg-0);
+}
+.message { display: flex; gap: 10px; max-width: 100%; }
+.message.user { flex-direction: row-reverse; align-self: flex-end; max-width: 85%; }
+.message.assistant { max-width: 92%; }
+.msg-avatar {
+  width: 32px; height: 32px; border-radius: 50%; background: var(--bg-3);
+  display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0;
+}
+.message.user .msg-avatar { background: var(--accent); }
+.msg-content {
+  background: var(--bg-2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 12px 16px;
+  font-size: 14px; line-height: 1.7;
+}
+.message.user .msg-content { background: rgba(168,85,247,.08); border-color: rgba(168,85,247,.25); }
+.msg-content p { margin-bottom: 8px; }
+.msg-content p:last-child { margin-bottom: 0; }
+.msg-content ul { padding-left: 18px; margin: 6px 0; }
+.msg-content li { margin-bottom: 4px; }
+.msg-content code {
+  background: var(--bg-0); border: 1px solid var(--border);
+  padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono);
+  font-size: 12px; color: var(--accent-2);
+}
+.msg-content pre {
+  background: var(--bg-0); border: 1px solid var(--border);
+  border-radius: 8px; padding: 14px; overflow-x: auto; margin: 10px 0;
+}
+.msg-content pre code { background: none; border: none; padding: 0; font-size: 12px; color: var(--text-0); }
+.msg-image { max-width: 280px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 8px; display: block; }
+.msg-status { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--teal); font-style: italic; }
+.att-chip   { font-size: 11px; color: var(--text-2); margin-bottom: 4px; }
+.msg-asset  { padding: 4px 0; }
+.action-block { background: var(--bg-0); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 8px; padding: 10px 14px; margin: 8px 0; font-family: var(--font-mono); font-size: 12px; }
+.action-tool  { color: var(--accent); font-weight: 600; }
+.streaming-cursor { display: inline-block; width: 7px; height: 14px; background: var(--accent); animation: blink 1s infinite; vertical-align: text-bottom; margin-left: 2px; border-radius: 2px; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+/* =====================================================================
+   ATTACHMENT STRIP
+   ===================================================================== */
+.attachments-strip {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 16px; background: var(--bg-1); border-top: 1px solid var(--border);
+  flex-shrink: 0; flex-wrap: wrap;
+}
+.attachments-label { font-size: 11px; color: var(--text-2); flex-shrink: 0; }
+.attachments-list  { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; }
+.attachment-chip {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--bg-2); border: 1px solid var(--border);
+  border-radius: 20px; padding: 4px 10px; font-size: 12px; color: var(--text-1);
+}
+.attachment-chip img { width: 20px; height: 20px; border-radius: 4px; object-fit: cover; }
+.remove-att { cursor: pointer; color: var(--text-2); margin-left: 4px; }
+.remove-att:hover { color: var(--red); }
+.type-image { border-color: rgba(59,130,246,.3); }
+.type-zip   { border-color: rgba(168,85,247,.3); }
+.type-file  { border-color: rgba(34,197,94,.3);  }
+
+/* =====================================================================
+   CHAT INPUT
+   ===================================================================== */
+.chat-input-area {
+  padding: 12px 16px; background: var(--bg-1);
+  border-top: 1px solid var(--border); flex-shrink: 0;
+}
+.chat-input-wrapper { display: flex; gap: 8px; align-items: flex-end; }
+.attach-btn {
+  width: 40px; height: 40px; border-radius: var(--radius); border: 1px solid var(--border);
+  background: var(--bg-2); color: var(--text-1); font-size: 17px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .15s;
+}
+.attach-btn:hover { border-color: var(--accent); color: var(--accent); }
+#chat-input {
+  flex: 1; background: var(--bg-2); border: 1px solid var(--border);
+  border-radius: var(--radius); color: var(--text-0); font-family: var(--font-sans);
+  font-size: 14px; padding: 10px 14px; resize: none; outline: none;
+  transition: border-color .2s; min-height: 44px; max-height: 160px; line-height: 1.5;
+}
+#chat-input:focus { border-color: var(--accent); }
+.send-btn {
+  width: 44px; height: 44px; border-radius: var(--radius);
+  background: var(--accent); border: none; color: white; font-size: 18px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: opacity .15s;
+}
+.send-btn:hover    { opacity: .85; }
+.send-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+/* =====================================================================
+   BUTTONS (shared)
+   ===================================================================== */
+.btn-primary {
+  background: var(--accent); color: white; border: none;
+  padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600;
+  cursor: pointer; font-family: var(--font-sans); transition: opacity .15s;
+}
+.btn-primary:hover    { opacity: .85; }
+.btn-primary:disabled { opacity: .4; cursor: not-allowed; }
+.btn-sm {
+  background: var(--bg-3); color: var(--text-1); border: 1px solid var(--border);
+  padding: 5px 12px; border-radius: 6px; font-size: 12px; cursor: pointer;
+  font-family: var(--font-sans); transition: all .12s; white-space: nowrap;
+}
+.btn-sm:hover { background: var(--bg-2); color: var(--text-0); border-color: var(--accent); }
+.badge-pill {
+  display: inline-block; padding: 2px 8px; border-radius: 10px;
+  background: rgba(168,85,247,.12); color: var(--accent); font-size: 10px; font-weight: 600;
 }
 
-.header-left{
-  display:flex;
-  align-items:center;
-  gap:14px;
+/* =====================================================================
+   RESTORE / PHOTO panel
+   ===================================================================== */
+.restore-app { flex: 1; overflow-y: auto; padding: 24px 20px; display: flex; flex-direction: column; gap: 20px; }
+.restore-hero { text-align: center; padding: 24px 16px; }
+.restore-hero h3 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+.restore-hero p  { font-size: 14px; color: var(--text-2); line-height: 1.6; }
+.upload-zone {
+  border: 2px dashed var(--accent); border-radius: 14px;
+  padding: 40px 24px; text-align: center; cursor: pointer;
+  transition: all .2s; background: rgba(168,85,247,.03);
+}
+.upload-zone:hover, .upload-zone.dragover { background: rgba(168,85,247,.08); border-color: var(--accent-2); }
+.upload-zone .zone-icon { font-size: 48px; margin-bottom: 12px; }
+.upload-zone h3 { font-size: 16px; margin-bottom: 6px; }
+.upload-zone p  { font-size: 13px; color: var(--text-2); }
+.modes-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px;
+}
+.mode-card {
+  background: var(--bg-2); border: 2px solid var(--border);
+  border-radius: 12px; padding: 16px; cursor: pointer; transition: all .15s; text-align: center;
+}
+.mode-card:hover, .mode-card.active { border-color: var(--accent); background: rgba(168,85,247,.06); }
+.mode-card.active { box-shadow: 0 0 0 2px var(--accent); }
+.mode-card .mode-icon { font-size: 28px; margin-bottom: 8px; }
+.mode-card h3 { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+.mode-card p  { font-size: 12px; color: var(--text-2); }
+.process-btn {
+  width: 100%; padding: 14px; font-size: 15px; font-weight: 700;
+  background: linear-gradient(135deg, var(--accent), #ec4899);
+  color: white; border: none; border-radius: var(--radius); cursor: pointer;
+  transition: opacity .15s; letter-spacing: .3px;
+}
+.process-btn:hover    { opacity: .88; }
+.process-btn:disabled { opacity: .4; cursor: not-allowed; }
+.restore-result { display: flex; flex-direction: column; gap: 14px; }
+.compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.compare-side { background: var(--bg-2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.compare-label { padding: 10px 14px; font-size: 12px; font-weight: 600; color: var(--text-2); background: var(--bg-1); border-bottom: 1px solid var(--border); }
+.compare-side img, .compare-side video { width: 100%; display: block; max-height: 280px; object-fit: contain; background: #000; }
+.restore-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+/* =====================================================================
+   VOICE PANEL
+   ===================================================================== */
+.voice-panel { flex: 1; overflow-y: auto; padding: 24px 20px; display: flex; flex-direction: column; gap: 20px; }
+.voice-ptt-section { text-align: center; padding: 16px; }
+.ptt-btn {
+  width: 110px; height: 110px; border-radius: 50%;
+  border: 3px solid var(--accent); background: rgba(168,85,247,.1);
+  color: white; font-size: 36px; cursor: pointer;
+  transition: all .15s; display: flex; align-items: center; justify-content: center;
+  margin: 0 auto; box-shadow: 0 0 0 0 var(--accent-glow);
+}
+.ptt-btn:active, .ptt-btn.recording {
+  background: var(--accent); transform: scale(1.06);
+  box-shadow: 0 0 0 14px rgba(168,85,247,.15), 0 0 0 28px rgba(168,85,247,.06);
+  animation: pulse-ring 1.2s infinite;
+}
+@keyframes pulse-ring { 0%{box-shadow:0 0 0 0 rgba(168,85,247,.4),0 0 0 0 rgba(168,85,247,.15)} 100%{box-shadow:0 0 0 18px rgba(168,85,247,0),0 0 0 36px rgba(168,85,247,0)} }
+.ptt-label { font-size: 14px; color: var(--text-2); margin-top: 14px; }
+.voice-card {
+  background: var(--bg-2); border: 1px solid var(--border); border-radius: 12px; padding: 18px;
+}
+.voice-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+.voice-card-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.voice-textarea { width: 100%; background: var(--bg-1); border: 1px solid var(--border); border-radius: 8px; color: var(--text-0); font-family: var(--font-sans); font-size: 13px; padding: 10px 12px; resize: vertical; outline: none; min-height: 80px; margin-top: 8px; }
+.voice-textarea:focus { border-color: var(--accent); }
+
+/* =====================================================================
+   PROJECTS PANEL
+   ===================================================================== */
+.projects-panel { flex: 1; overflow-y: auto; padding: 20px; }
+.projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin-top: 16px; }
+.project-card { background: var(--bg-2); border: 1px solid var(--border); border-radius: 12px; padding: 18px; cursor: pointer; transition: all .15s; }
+.project-card:hover { border-color: var(--accent); background: rgba(168,85,247,.05); }
+.project-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 6px; font-family: var(--font-mono); color: var(--accent-2); }
+.project-card p  { font-size: 12px; color: var(--text-2); line-height: 1.5; }
+.project-meta { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.project-tag { font-size: 10px; padding: 2px 8px; border-radius: 10px; background: var(--bg-3); color: var(--text-2); }
+
+/* =====================================================================
+   EDITOR / CODE PANEL
+   ===================================================================== */
+.editor-layout { display: flex; flex: 1; overflow: hidden; }
+.editor-sidebar { width: 220px; background: var(--bg-1); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; overflow: hidden; }
+.editor-sidebar-header { padding: 12px 16px; font-size: 12px; color: var(--text-2); font-weight: 600; border-bottom: 1px solid var(--border); }
+.file-tree { flex: 1; overflow-y: auto; padding: 6px; }
+.file-item { padding: 7px 12px; font-size: 12px; font-family: var(--font-mono); color: var(--text-1); cursor: pointer; border-radius: 6px; transition: all .12s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.file-item:hover  { background: var(--bg-2); color: var(--text-0); }
+.file-item.active { background: rgba(168,85,247,.1); color: var(--accent); }
+.file-dir { color: var(--text-2); font-size: 10px; text-transform: uppercase; letter-spacing: .4px; padding: 8px 12px 3px; }
+.code-editor {
+  flex: 1; background: var(--bg-0); border: none; color: var(--text-0);
+  font-family: var(--font-mono); font-size: 13px; padding: 16px; resize: none;
+  outline: none; width: 100%; tab-size: 2; line-height: 1.6;
 }
 
-.menu-btn{
-  width:46px;
-  height:46px;
+/* =====================================================================
+   TERMINAL
+   ===================================================================== */
+.terminal-panel { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.terminal-output {
+  flex: 1; overflow-y: auto; padding: 16px; background: #0a0c0f;
+  font-family: var(--font-mono); font-size: 13px; line-height: 1.7; color: #d4d4d4;
+}
+.terminal-output .t-prompt { color: var(--green); }
+.terminal-output .t-error  { color: var(--red); }
+.terminal-output .t-info   { color: var(--teal); }
+.terminal-output .t-warn   { color: var(--yellow); }
+.terminal-input-row { display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: var(--bg-1); border-top: 1px solid var(--border); flex-shrink: 0; }
+.terminal-prompt { color: var(--green); font-family: var(--font-mono); font-size: 13px; white-space: nowrap; }
+#terminal-cmd { flex: 1; background: transparent; border: none; color: var(--text-0); font-family: var(--font-mono); font-size: 13px; outline: none; }
+.terminal-cwd { font-size: 11px; color: var(--text-2); font-family: var(--font-mono); }
 
-  border:none;
-  border-radius:14px;
+/* =====================================================================
+   MEMORY PANEL
+   ===================================================================== */
+.memory-panel { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+.memory-card { background: var(--bg-2); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
+.memory-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 10px; color: var(--accent-2); }
+.memory-entry { padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; line-height: 1.6; }
+.memory-entry:last-child { border-bottom: none; }
+.memory-meta { font-size: 11px; color: var(--text-2); margin-top: 4px; }
 
-  background:#12192a;
-  color:white;
+/* =====================================================================
+   TOOLS PANEL
+   ===================================================================== */
+.tools-panel { flex: 1; overflow-y: auto; padding: 20px; }
+.tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin-top: 16px; }
+.tool-card { background: var(--bg-2); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
+.tool-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 6px; font-family: var(--font-mono); color: var(--accent-2); }
+.tool-card p  { font-size: 12px; color: var(--text-2); line-height: 1.5; }
+.tool-inputs  { margin-top: 10px; font-size: 11px; color: var(--text-2); }
 
-  font-size:24px;
+/* =====================================================================
+   CREATIVE STUDIO
+   ===================================================================== */
+.creative-tabs { display: flex; gap: 2px; padding: 10px 16px; background: var(--bg-1); border-bottom: 1px solid var(--border); flex-shrink: 0; flex-wrap: wrap; }
+.creative-tab {
+  padding: 8px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; border: none;
+  background: transparent; color: var(--text-2); font-family: var(--font-sans); transition: all .15s;
+}
+.creative-tab:hover  { color: var(--text-0); background: var(--bg-2); }
+.creative-tab.active { background: rgba(168,85,247,.12); color: var(--accent); font-weight: 500; }
+.creative-panel { display: none; flex: 1; overflow-y: auto; padding: 24px 20px; }
+.creative-panel.active { display: block; }
+.creative-form { display: flex; flex-direction: column; gap: 14px; max-width: 560px; }
+.creative-form h3 { font-size: 16px; font-weight: 700; }
+.form-hint { font-size: 13px; color: var(--text-2); }
+.creative-form label { font-size: 12px; color: var(--text-2); font-weight: 500; margin-bottom: 4px; display: block; }
+.creative-form textarea, .creative-form input[type=text], .creative-form input[type=number] {
+  width: 100%; background: var(--bg-2); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--text-0); padding: 10px 14px;
+  font-family: var(--font-sans); font-size: 13px; outline: none; resize: vertical;
+}
+.creative-form textarea:focus, .creative-form input:focus { border-color: var(--accent); }
+.creative-form select {
+  width: 100%; background: var(--bg-2); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--text-0); padding: 10px 14px;
+  font-family: var(--font-sans); font-size: 13px; cursor: pointer; outline: none;
+}
+.form-row { display: flex; gap: 12px; flex-wrap: wrap; }
+.form-group { flex: 1; min-width: 120px; display: flex; flex-direction: column; gap: 5px; }
+.result-area { background: var(--bg-2); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+
+/* =====================================================================
+   TOAST NOTIFICATIONS
+   ===================================================================== */
+#toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+.toast {
+  background: var(--bg-2); border: 1px solid var(--border); border-radius: 10px;
+  padding: 12px 18px; font-size: 13px; color: var(--text-0);
+  box-shadow: 0 8px 24px rgba(0,0,0,.5); opacity: 0; transform: translateY(10px);
+  transition: all .25s; min-width: 220px; max-width: 340px; pointer-events: all;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast-title   { font-weight: 600; margin-bottom: 3px; }
+.toast-message { font-size: 12px; color: var(--text-2); }
+.toast.success { border-left: 3px solid var(--green); }
+.toast.error   { border-left: 3px solid var(--red);   }
+.toast.warn    { border-left: 3px solid var(--yellow); }
+
+/* =====================================================================
+   INTERNAL / SELF EDIT (legacy panel kept for compat)
+   ===================================================================== */
+.internal-layout { display: flex; flex: 1; overflow: hidden; }
+.internal-sidebar { width: 220px; background: var(--bg-1); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; overflow: hidden; }
+.internal-sidebar-header { padding: 12px 16px; font-size: 12px; color: var(--text-2); font-weight: 600; border-bottom: 1px solid var(--border); }
+.internal-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.internal-file-view { display: flex; flex-direction: column; height: 50%; border-bottom: 1px solid var(--border); }
+.internal-file-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 14px; background: var(--bg-1); border-bottom: 1px solid var(--border); font-size: 12px; flex-shrink: 0; }
+.internal-chat { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.internal-chat-messages { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.internal-input-row { display: flex; gap: 8px; padding: 10px 14px; background: var(--bg-1); border-top: 1px solid var(--border); align-items: flex-end; flex-shrink: 0; }
+.internal-input-row textarea { flex: 1; background: var(--bg-2); border: 1px solid var(--border); border-radius: 8px; color: var(--text-0); font-family: var(--font-sans); font-size: 13px; padding: 8px 12px; resize: none; outline: none; }
+.internal-input-row textarea:focus { border-color: var(--accent); }
+
+/* =====================================================================
+   SYNTH AI v2
+   ===================================================================== */
+.synth-badge-offline { font-size:11px;padding:3px 9px;border-radius:10px;background:rgba(239,68,68,.1);color:var(--red); }
+.synth-badge-online  { font-size:11px;padding:3px 9px;border-radius:10px;background:rgba(34,197,94,.1);color:var(--green); }
+.synth-badge-warn    { font-size:11px;padding:3px 9px;border-radius:10px;background:rgba(234,179,8,.1);color:var(--yellow); }
+.synth-mode-dropdown { background:var(--bg-2);border:1px solid var(--border);border-radius:8px;color:var(--text-0);padding:6px 10px;font-size:12px;font-family:var(--font-sans);cursor:pointer;outline:none; }
+.synth-layout { display:flex;flex:1;overflow:hidden; }
+.synth-sidebar { width:220px;background:var(--bg-1);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden; }
+.synth-sidebar-section { padding:14px;border-bottom:1px solid var(--border); }
+.synth-sidebar-label { font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-2);margin-bottom:7px; }
+.synth-ctx-input { width:100%;background:var(--bg-2);border:1px solid var(--border);border-radius:8px;color:var(--text-0);padding:8px 12px;font-size:13px;outline:none;font-family:var(--font-sans); }
+.synth-ctx-input:focus { border-color:var(--accent); }
+.synth-mode-tip-text { font-size:12px;color:var(--text-2);line-height:1.6; }
+.synth-file-item-v2 { padding:7px 12px;font-size:12px;font-family:var(--font-mono);color:var(--text-1);cursor:pointer;border-radius:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:all .12s; }
+.synth-file-item-v2:hover { background:var(--bg-2);color:var(--text-0); }
+.synth-file-item-v2.active { background:rgba(168,85,247,.1);color:var(--accent); }
+.synth-file-group-label { padding:6px 12px 2px;font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-2); }
+.synth-review-run-btn { background:var(--accent);color:#fff;border:none;padding:9px;border-radius:8px;font-size:13px;cursor:pointer;font-family:var(--font-sans);width:100%;margin-top:8px; }
+.synth-chat-area { flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0; }
+.synth-messages { flex:1;overflow-y:auto;padding:20px 16px;display:flex;flex-direction:column;gap:16px;background:var(--bg-0); }
+.synth-input-row { display:flex;gap:8px;align-items:flex-end;padding:12px 16px;background:var(--bg-1);border-top:1px solid var(--border);flex-shrink:0; }
+.synth-textarea { flex:1;background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-0);font-family:var(--font-sans);font-size:14px;padding:10px 14px;resize:none;outline:none;min-height:44px;max-height:160px;line-height:1.5; }
+.synth-textarea:focus { border-color:var(--accent); }
+.synth-input-hint { padding:4px 16px 10px;font-size:11px;color:var(--text-2);background:var(--bg-1);text-align:center;flex-shrink:0; }
+.synth-file-strip { border-bottom:1px solid var(--border);flex-shrink:0;display:flex;flex-direction:column;height:45%;background:var(--bg-0); }
+.synth-file-strip-header { display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:var(--bg-1);border-bottom:1px solid var(--border);flex-shrink:0;gap:8px;flex-wrap:wrap; }
+.synth-strip-name { font-size:12px;font-family:var(--font-mono);color:var(--accent-2);flex:1; }
+.synth-file-editor { flex:1;resize:none; }
+
+/* Approval card */
+.synth-approval-card { background:var(--bg-1);border:2px solid var(--accent);border-radius:12px;overflow:hidden;margin:4px 0; }
+.synth-approval-header { display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:rgba(168,85,247,.06);border-bottom:1px solid rgba(168,85,247,.2);flex-wrap:wrap;gap:8px; }
+.synth-approval-title { font-size:15px;font-weight:700;color:var(--text-0); }
+.synth-approval-kind  { font-size:10px;padding:3px 9px;border-radius:10px;background:rgba(168,85,247,.15);color:var(--accent);font-weight:700;text-transform:uppercase; }
+.synth-approval-body  { padding:16px 18px; }
+.synth-file-checklist { display:flex;flex-direction:column;gap:6px;margin-bottom:14px; }
+.synth-file-check-item { display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg-2);border:1px solid var(--border);border-radius:8px;font-size:13px;cursor:pointer;transition:background .12s; }
+.synth-file-check-item:hover { background:var(--bg-3); }
+.synth-file-check-item input[type=checkbox] { accent-color:var(--accent);width:15px;height:15px;flex-shrink:0; }
+.synth-check-path   { font-family:var(--font-mono);color:var(--text-0);flex:1; }
+.synth-check-size   { color:var(--text-2);font-size:11px;white-space:nowrap; }
+.synth-check-reason { color:var(--gold);font-size:11px;margin-left:4px; }
+.synth-preview-btn  { background:transparent;border:1px solid var(--border);border-radius:5px;padding:3px 8px;font-size:11px;color:var(--text-2);cursor:pointer;font-family:var(--font-sans);white-space:nowrap; }
+.synth-preview-btn:hover { border-color:var(--accent);color:var(--accent); }
+.synth-approval-actions { display:flex;gap:10px;align-items:center;flex-wrap:wrap; }
+.synth-approve-btn { background:var(--green);color:#fff;border:none;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-sans);transition:opacity .15s; }
+.synth-approve-btn:hover { opacity:.85; }
+.synth-approve-btn:disabled { opacity:.4;cursor:not-allowed; }
+.synth-reject-btn  { background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.25);padding:10px 20px;border-radius:8px;font-size:13px;cursor:pointer;font-family:var(--font-sans); }
+.synth-reject-btn:hover { background:rgba(239,68,68,.2); }
+.synth-select-all-btn { background:transparent;border:1px solid var(--border);padding:8px 14px;border-radius:8px;font-size:12px;color:var(--text-1);cursor:pointer;font-family:var(--font-sans); }
+.synth-approval-done { padding:12px 16px;font-size:13px;border-top:1px solid var(--border);color:var(--text-2); }
+.synth-applied-ok  { color:var(--green); }
+.synth-applied-no  { color:var(--red); }
+.synth-code-preview { background:var(--bg-0);border:1px solid var(--border);border-radius:8px;padding:14px;margin:8px 0;font-family:var(--font-mono);font-size:12px;color:var(--text-0);white-space:pre-wrap;max-height:300px;overflow:auto;display:none; }
+
+/* =====================================================================
+   MOBILE — overlay sidebar, full-width panels
+   ===================================================================== */
+@media (max-width: 768px) {
+  /* Show topbar hamburger */
+  #topbar { display: flex; }
+
+  /* Sidebar becomes a slide-over drawer */
+  #sidebar {
+    position: fixed; top: 0; left: 0; bottom: 0;
+    width: min(var(--sidebar-w), 85vw);
+    transform: translateX(-100%);
+    transition: transform .25s ease;
+    z-index: 200; box-shadow: 4px 0 24px rgba(0,0,0,.6);
+  }
+  #sidebar.open { transform: translateX(0); }
+
+  /* Dim overlay behind drawer */
+  #sidebar-backdrop {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,.55);
+    z-index: 199;
+  }
+  #sidebar-backdrop.visible { display: block; }
+
+  /* Main fills full screen, shifted down by topbar */
+  #main { height: calc(100vh - var(--header-h)); }
+
+  /* Preview pane hides behind a button on mobile */
+  .builder-preview-side { display: none !important; }
+  .builder-preview-side.mobile-open { display: flex !important; position: fixed; inset: 0; top: var(--header-h); z-index: 100; }
+
+  /* Split layout stays single column */
+  .builder-split { flex-direction: column; }
+  .builder-chat-side { min-height: 0; }
+
+  /* Synth sidebar collapses */
+  .synth-layout { flex-direction: column; }
+  .synth-sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); max-height: 180px; }
+
+  /* Editor sidebar collapses */
+  .editor-layout { flex-direction: column; }
+  .editor-sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); max-height: 140px; }
+
+  /* File strip shorter */
+  .synth-file-strip { height: 35%; }
+
+  /* Compare grid stacks */
+  .compare-grid { grid-template-columns: 1fr; }
+
+  /* Modes grid narrower */
+  .modes-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+
+  /* Internal layout */
+  .internal-layout { flex-direction: column; }
+  .internal-sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); max-height: 120px; }
+  .internal-file-view { height: 35%; }
+
+  /* Panel header tighter */
+  .panel-header { padding: 12px 16px; }
+  .panel-header h2 { font-size: 15px; }
+
+  /* Bigger tap targets */
+  .nav-btn { padding: 12px 16px; font-size: 15px; }
+  .send-btn, .attach-btn { width: 44px; height: 44px; }
+  #chat-input { font-size: 15px; }
+
+  /* Full-width approval cards */
+  .synth-file-check-item { flex-wrap: wrap; }
+  .synth-check-path { min-width: 0; word-break: break-all; }
 }
 
-.brand{
-  font-size:28px;
-  font-weight:700;
-
-  background:linear-gradient(
-    135deg,
-    var(--purple1),
-    var(--purple2)
-  );
-
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
+@media (max-width: 480px) {
+  .modes-grid { grid-template-columns: 1fr 1fr; }
+  .projects-grid { grid-template-columns: 1fr; }
+  .tools-grid { grid-template-columns: 1fr; }
+  .creative-form { padding-bottom: 24px; }
+  .synth-approval-header { flex-direction: column; align-items: flex-start; }
 }
 
-.copyright{
-  font-size:14px;
-  color:#8e8ea0;
+/* =====================================================================
+   SIDEBAR ACTION BUTTONS
+   ===================================================================== */
+.sidebar-action-btn {
+  width: 100%; padding: 10px 14px; border: none; border-radius: 9px;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  font-family: var(--font-sans); transition: all .15s; text-align: center;
+  letter-spacing: .2px;
+}
+.sidebar-action-build {
+  background: linear-gradient(135deg, var(--accent), #7c3aed);
+  color: white; box-shadow: 0 2px 12px rgba(168,85,247,.25);
+}
+.sidebar-action-build:hover { opacity: .88; transform: translateY(-1px); }
+.sidebar-action-download {
+  background: linear-gradient(135deg, #059669, #047857);
+  color: white; box-shadow: 0 2px 10px rgba(5,150,105,.2);
+}
+.sidebar-action-download:hover { opacity: .88; transform: translateY(-1px); }
+.sidebar-action-project {
+  background: var(--bg-3); color: var(--text-0); border: 1px solid var(--border);
+}
+.sidebar-action-project:hover { border-color: var(--accent); background: var(--bg-2); }
+
+/* =====================================================================
+   PROJECT CARDS (improved)
+   ===================================================================== */
+.projects-grid { padding: 18px; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; overflow-y: auto; flex: 1; }
+.project-card { background: var(--bg-2); border: 1px solid var(--border); border-radius: 12px; padding: 18px; transition: all .15s; }
+.project-card:hover { border-color: var(--accent); }
+.project-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; font-family: var(--font-mono); color: var(--accent-2); }
+.project-card p  { font-size: 13px; color: var(--text-2); line-height: 1.5; margin-bottom: 12px; }
+.project-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn-open   { background: var(--accent); color: white; border: none; padding: 7px 14px; border-radius: 7px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: var(--font-sans); }
+.btn-danger { background: rgba(239,68,68,.1); color: var(--red); border: 1px solid rgba(239,68,68,.2); padding: 7px 14px; border-radius: 7px; font-size: 12px; cursor: pointer; font-family: var(--font-sans); }
+.btn-open:hover   { opacity: .85; }
+.btn-danger:hover { background: rgba(239,68,68,.2); }
+.empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; color: var(--text-2); gap: 12px; }
+.empty-icon { font-size: 52px; }
+.empty-state p { font-size: 14px; }
+
+/* =====================================================================
+   OFFLINE FALLBACK STATES
+   ===================================================================== */
+.offline-panel {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 16px; padding: 40px 20px; color: var(--text-2); text-align: center;
+}
+.offline-panel .offline-icon { font-size: 56px; }
+.offline-panel h3 { font-size: 18px; font-weight: 600; color: var(--text-1); }
+.offline-panel p  { font-size: 14px; max-width: 420px; line-height: 1.6; }
+.offline-panel code { background: var(--bg-2); border: 1px solid var(--border); padding: 3px 8px; border-radius: 5px; font-family: var(--font-mono); font-size: 13px; color: var(--accent-2); }
+.offline-cmd-block { background: var(--bg-1); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; text-align: left; width: 100%; max-width: 420px; }
+.offline-cmd-block .cmd-label { font-size: 11px; color: var(--text-2); margin-bottom: 8px; text-transform: uppercase; letter-spacing: .5px; }
+.offline-cmd-block .cmd-line  { font-family: var(--font-mono); font-size: 13px; color: var(--green); margin: 4px 0; }
+
+/* =====================================================================
+   DOWNLOAD PROGRESS TOAST
+   ===================================================================== */
+.download-toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+  background: var(--bg-2); border: 1px solid var(--accent); border-radius: 12px;
+  padding: 14px 22px; display: flex; align-items: center; gap: 14px;
+  font-size: 14px; color: var(--text-0); z-index: 9999;
+  box-shadow: 0 8px 32px rgba(0,0,0,.5);
+  transition: transform .3s ease; min-width: 280px;
+}
+.download-toast.visible { transform: translateX(-50%) translateY(0); }
+.download-toast .dl-spinner { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border); border-top-color: var(--accent); animation: spin .7s linear infinite; flex-shrink: 0; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+
+/* ============================================================
+   SRL MOBILE FOOTER FIX + SAM'S STUDIO SPLASH
+   Locked for Android visibility: upload + input + send always visible
+   © 2026 SRL - S.R.Langlois
+   ============================================================ */
+#srl-splash{
+  position:fixed; inset:0; z-index:100000;
+  display:flex; align-items:center; justify-content:center;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(168,85,247,.42), transparent 34%),
+    radial-gradient(circle at 50% 84%, rgba(126,34,206,.32), transparent 38%),
+    linear-gradient(180deg,#02030a,#080214 52%,#02030a);
+  color:#fff; overflow:hidden;
+  transition:opacity .55s ease, visibility .55s ease;
+}
+#srl-splash.hidden{opacity:0; visibility:hidden; pointer-events:none;}
+.srl-splash-card{width:min(92vw,430px); text-align:center; padding:34px 20px 28px;}
+.srl-splash-orb{
+  width:156px; height:156px; margin:0 auto 18px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  background:radial-gradient(circle at 40% 30%,#ffffff,#c084fc 22%,#7c3aed 58%,#12002b 100%);
+  box-shadow:0 0 42px rgba(168,85,247,.75), inset 0 0 24px rgba(255,255,255,.35);
+  font-size:94px; font-weight:900; line-height:1; color:#fff;
+}
+.srl-splash-title{font-size:46px; font-weight:900; letter-spacing:8px; margin:0; text-transform:uppercase;}
+.srl-splash-sub{font-size:25px; letter-spacing:14px; color:#b86cff; margin:2px 0 18px; text-transform:uppercase;}
+.srl-splash-tag{font-size:17px; letter-spacing:.5px; margin:0 0 8px;}
+.srl-splash-script{font-size:34px; color:#e879f9; font-style:italic; margin-bottom:18px; text-shadow:0 0 18px rgba(232,121,249,.75);}
+.srl-feature-row{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin:18px 0 24px;}
+.srl-feature{border-left:1px solid rgba(168,85,247,.35); color:#d8b4fe; font-size:10px; letter-spacing:1px; text-transform:uppercase;}
+.srl-feature:first-child{border-left:0;}
+.srl-feature b{display:block; font-size:24px; margin-bottom:5px;}
+.srl-load-label{font-size:15px; color:#d8b4fe; letter-spacing:5px; margin-bottom:12px;}
+.srl-load-bar{height:18px; border:2px solid #a855f7; border-radius:20px; overflow:hidden; background:#05010d;}
+.srl-load-fill{height:100%; width:72%; border-radius:20px; background:linear-gradient(90deg,#7c3aed,#a855f7,#f0abfc); box-shadow:0 0 22px rgba(216,180,254,.85); animation:srlPulse 1.6s ease-in-out infinite alternate;}
+@keyframes srlPulse{from{filter:brightness(.9)}to{filter:brightness(1.25)}}
+.srl-splash-copy{margin-top:28px; font-size:14px; color:#c4b5fd;}
+.srl-splash-private{margin:18px auto 0; padding:11px 12px; width:max-content; max-width:100%; border:1px solid #9333ea; border-radius:12px; color:#c084fc; font-size:13px; letter-spacing:1px;}
+
+@media (max-width: 768px){
+  html,body{height:100dvh; overflow:hidden;}
+  #app{height:100dvh; overflow:hidden;}
+  #main{height:calc(100dvh - var(--header-h)); overflow:hidden;}
+  .panel.active{height:100%; overflow:hidden;}
+  .builder-split{height:100%; min-height:0;}
+  .builder-chat-side{height:100%; min-height:0; padding-bottom:96px;}
+  .chat-messages{
+    min-height:0;
+    overflow-y:auto;
+    padding-bottom:128px !important;
+    -webkit-overflow-scrolling:touch;
+  }
+  .chat-input-area{
+    position:fixed !important;
+    left:0; right:0; bottom:0;
+    z-index:99999;
+    padding:10px 12px calc(10px + env(safe-area-inset-bottom)) !important;
+    background:rgba(13,15,18,.98) !important;
+    border-top:1px solid var(--border);
+    box-shadow:0 -10px 30px rgba(0,0,0,.45);
+  }
+  .chat-input-wrapper{
+    display:grid !important;
+    grid-template-columns:52px minmax(0,1fr) 56px;
+    gap:10px !important;
+    align-items:end;
+    width:100%;
+  }
+  .attach-btn{
+    display:flex !important;
+    width:52px !important; height:52px !important;
+    min-width:52px !important;
+    opacity:1 !important; visibility:visible !important;
+    border-radius:16px !important;
+    font-size:22px !important;
+    z-index:100000 !important;
+  }
+  #chat-input{
+    min-height:52px !important;
+    max-height:132px !important;
+    width:100% !important;
+    font-size:16px !important;
+    line-height:1.45 !important;
+    border-radius:16px !important;
+  }
+  .send-btn{
+    width:56px !important; height:56px !important;
+    min-width:56px !important;
+    border-radius:18px !important;
+    z-index:100000 !important;
+  }
+  .attachments-strip{
+    position:fixed; left:0; right:0; bottom:calc(84px + env(safe-area-inset-bottom));
+    z-index:99998;
+    max-height:88px; overflow:auto;
+  }
+  .chat-hints{display:none;}
 }
 
-/* CHAT AREA */
-
-.chat-area{
-  flex:1;
-  overflow-y:auto;
-
-  padding:18px;
-  padding-bottom:140px;
-}
-
-/* MESSAGE */
-
-.message-row{
-  display:flex;
-  gap:14px;
-}
-
-.avatar{
-  width:54px;
-  height:54px;
-  flex-shrink:0;
-
-  border-radius:50%;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  background:linear-gradient(
-    135deg,
-    #2d1f55,
-    #6d28d9
-  );
-
-  font-size:26px;
-}
-
-.message-card{
-  flex:1;
-
-  background:#111827;
-
-  border:1px solid var(--border);
-  border-radius:24px;
-
-  padding:22px;
-}
-
-.message-card h2{
-  margin:0 0 18px 0;
-  font-size:20px;
-}
-
-.message-card p{
-  margin:0 0 18px 0;
-  line-height:1.7;
-  color:#f2f2f2;
-  font-size:16px;
-}
-
-/* TOOLBAR */
-
-.toolbar{
-  display:flex;
-  gap:12px;
-  margin-bottom:22px;
-  flex-wrap:wrap;
-}
-
-.toolbar button{
-  height:48px;
-
-  padding:0 18px;
-
-  border:none;
-  border-radius:14px;
-
-  background:#1a2235;
-  color:white;
-
-  font-size:15px;
-}
-
-/* FIXED INPUT BAR */
-
-.chat-input-wrap{
-  position:fixed;
-  left:0;
-  right:0;
-  bottom:0;
-  z-index:9999;
-
-  display:flex;
-  align-items:center;
-  gap:10px;
-
-  padding:12px;
-  padding-bottom:calc(
-    12px + env(safe-area-inset-bottom)
-  );
-
-  background:rgba(10,14,24,.96);
-
-  backdrop-filter:blur(10px);
-
-  border-top:1px solid var(--border);
-}
-
-/* UPLOAD */
-
-.upload-btn{
-  width:54px;
-  height:54px;
-
-  flex-shrink:0;
-
-  border:none;
-  border-radius:18px;
-
-  background:#1f2840;
-  color:white;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  font-size:24px;
-}
-
-/* INPUT */
-
-.chat-input{
-  flex:1;
-
-  min-height:54px;
-  max-height:140px;
-
-  border-radius:18px;
-  border:1px solid var(--border);
-
-  background:var(--panel);
-  color:white;
-
-  padding:15px;
-
-  font-size:16px;
-
-  resize:none;
-  overflow-y:auto;
-}
-
-/* SEND */
-
-.send-btn{
-  width:58px;
-  height:58px;
-
-  flex-shrink:0;
-
-  border:none;
-  border-radius:20px;
-
-  background:linear-gradient(
-    135deg,
-    var(--purple1),
-    var(--purple2)
-  );
-
-  color:white;
-  font-size:26px;
-  font-weight:700;
-}
-
-/* PREVIEW */
-
-.preview-panel{
-  margin-top:24px;
-
-  border-radius:24px;
-
-  border:1px solid var(--border);
-
-  overflow:hidden;
-
-  background:#0d1320;
-}
-
-.preview-header{
-  padding:14px 18px;
-
-  border-bottom:1px solid var(--border);
-
-  font-weight:600;
-}
-
-.preview-body{
-  height:220px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  color:#8e8ea0;
-}
-
-/* MOBILE FIX */
-
-input,
-textarea{
-  font-size:16px;
-}
-
-</style>
+  </style>
 </head>
-
 <body>
 
-<!-- HEADER -->
-
-<div class="header">
-
-  <div class="header-left">
-
-    <button class="menu-btn">
-      ☰
-    </button>
-
-    <div class="brand">
-      ✨ Sam's Builder
+<!-- SAM'S STUDIO SPLASH SCREEN — © 2026 SRL - S.R.Langlois -->
+<div id="srl-splash" aria-label="Sam's Studio loading screen">
+  <div class="srl-splash-card">
+    <div class="srl-splash-orb">S</div>
+    <h1 class="srl-splash-title">SAM'S</h1>
+    <div class="srl-splash-sub">STUDIO</div>
+    <div class="srl-splash-tag">Imagine It. Start It. Finish It.</div>
+    <div class="srl-splash-script">Make it Real.</div>
+    <div class="srl-feature-row">
+      <div class="srl-feature"><b>&lt;/&gt;</b>Build</div>
+      <div class="srl-feature"><b>🎨</b>Design</div>
+      <div class="srl-feature"><b>🧠</b>AI Assist</div>
+      <div class="srl-feature"><b>▻</b>Preview</div>
     </div>
-
+    <div class="srl-load-label">LOADING STUDIO...</div>
+    <div class="srl-load-bar"><div class="srl-load-fill"></div></div>
+    <div class="srl-splash-copy">by SRL<br>© 2026 SRL - S.R.Langlois. All rights reserved.</div>
+    <div class="srl-splash-private">100% PRIVATE • 100% OFFLINE • 100% YOURS</div>
   </div>
-
-  <div class="copyright">
-    © 2026 SRL - S.R.Langlois
-  </div>
-
 </div>
 
-<!-- CHAT -->
+<div id="topbar">
+  <button id="hamburger-btn" aria-label="Menu">☰</button>
+  <span id="topbar-logo">✨ Sam's Builder</span>
+  <span id="topbar-title" style="text-align:right;font-size:12px;color:var(--text-2)">© 2026 SRL</span>
+</div>
+<div id="sidebar-backdrop"></div>
+<div id="app">
 
-<div class="chat-area">
-
-  <div class="toolbar">
-
-    <button>
-      👁 Show Preview
-    </button>
-
-    <button>
-      🎙 Hold to Speak
-    </button>
-
-    <button>
-      🧠 Photo Restore
-    </button>
-
-  </div>
-
-  <div class="message-row">
-
-    <div class="avatar">
-      ✨
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <span class="logo-icon">✨</span>
+        <div>
+          <div class="logo-text">Sam's Builder</div>
+          <div class="logo-sub">Powered by FORGE AI Engine</div>
+        </div>
+      </div>
+      <div class="copyright-badge">© 2026 SRL · S.R.Langlois</div>
+      <div class="ai-status" style="margin-top:10px">
+        <span class="status-dot" id="ai-dot"></span><span class="status-text" id="ai-text">Checking AI...</span>
+      </div>
+      <div class="ai-status" style="margin-top:4px">
+        <span class="status-dot" id="vision-dot"></span><span class="status-text" id="vision-text">Vision...</span>
+      </div>
+      <div class="ai-status" style="margin-top:4px">
+        <span class="status-dot" id="voice-dot"></span><span class="status-text" id="voice-text">Voice...</span>
+      </div>
+      <!-- Action buttons -->
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px">
+        <button class="sidebar-action-btn sidebar-action-build" id="build-restore-app-btn">🔨 Build This App</button>
+        <button class="sidebar-action-btn sidebar-action-download" id="download-sams-builder-btn">⬇ Download Sam's Builder</button>
+        <button class="sidebar-action-btn sidebar-action-project" id="download-active-project-sidebar-btn" style="display:none">📦 Download Project</button>
+      </div>
     </div>
 
-    <div class="message-card">
+    <nav class="sidebar-nav">
+      <button class="nav-btn" data-panel="restore">📸 Photo Restore <span class="nav-badge">NEW</span></button>
+      <button class="nav-btn active" data-panel="chat">💬 Chat & Build</button>
+      <button class="nav-btn" data-panel="voice">🎙️ Voice</button>
+      <button class="nav-btn" data-panel="synth">🤖 Synth AI <span class="nav-badge">✨</span></button>
+      <button class="nav-btn" data-panel="creative">🎨 Creative Studio</button>
+      <button class="nav-btn" data-panel="projects">📁 Projects</button>
+      <button class="nav-btn" data-panel="editor">📝 Editor</button>
+      <button class="nav-btn" data-panel="terminal">⚡ Terminal</button>
+      <button class="nav-btn" data-panel="memory">🧠 Memory</button>
+      <button class="nav-btn" data-panel="tools">🔧 Tools</button>
+    </nav>
 
-      <h2>
-        Hey Samantha — welcome to Sam's Builder.
-      </h2>
+    <div class="model-selector">
+      <label>Text Model</label>
+      <select id="model-select">
+        <option value="codellama">CodeLlama</option>
+        <option value="deepseek-coder">DeepSeek Coder</option>
+        <option value="llama3">Llama 3</option>
+        <option value="mistral">Mistral</option>
+        <option value="phi3">Phi-3</option>
+      </select>
+    </div>
+    <div class="model-selector" style="margin-top:0">
+      <label>Vision Model</label>
+      <select id="vision-select">
+        <option value="llava">LLaVA</option>
+        <option value="llava:13b">LLaVA 13B</option>
+        <option value="moondream">Moondream</option>
+      </select>
+    </div>
+    <div class="project-context" id="project-context" style="display:none">
+      <label>Active Project</label>
+      <div class="active-project-name" id="active-project-name">—</div>
+    </div>
+    <div class="offline-badge">🔒 100% Offline · © SRL S.R.Langlois</div>
+  </aside>
 
-      <p>
-        I'm your personal offline AI builder.
-      </p>
-
-      <p>
-        Everything I build shows up in the live preview system.
-      </p>
-
-      <p>
-        Upload a wireframe, describe an app, or speak naturally.
-      </p>
-
-      <p>
-        Example:
-        "Build me a cinematic poker league app with live race board tracking."
-      </p>
-
+  <!-- MAIN -->
+  <main id="main">
+    <div class="drop-overlay" id="drop-overlay">
+      <div class="drop-icon">📎</div>
+      <div class="drop-text">Drop files here</div>
+      <div class="drop-sub">Images · ZIPs · CSV · JSON · Code</div>
     </div>
 
-  </div>
+    <!-- ══════════════════════════════════════════
+         PHOTO RESTORE APP (First App)
+    ══════════════════════════════════════════ -->
+    <div class="panel" id="panel-restore">
+      <div class="panel-header">
+        <h2>📸 Memory Revival Studio</h2>
+        <div class="header-actions">
+          <span style="font-size:11px;color:var(--text-2)">© 2026 SRL · S.R.Langlois</span>
+        </div>
+      </div>
 
-  <!-- PREVIEW -->
+      <div class="restore-app">
+        <div class="restore-hero">
+          <h1>✨ Relive Your Memories</h1>
+          <p>Restore old photos • Colorize • Animate with life • All local, all yours</p>
+          <div class="copyright-line">© 2026 SRL — S.R.Langlois · Sam's Builder</div>
+        </div>
 
-  <div class="preview-panel">
+        <!-- Upload Zone -->
+        <div class="restore-upload-zone" id="restore-upload-zone">
+          <input type="file" id="restore-file-input" accept="image/*" style="display:none">
+          <div class="upload-icon">🖼️</div>
+          <h3>Drop your photo here or click to upload</h3>
+          <p>Old family photos, vintage portraits, damaged prints — any era, any condition</p>
+          <p style="margin-top:8px;font-size:11px;color:var(--accent)">JPG · PNG · WEBP · BMP · up to 50MB</p>
+        </div>
 
-    <div class="preview-header">
-      🖥 Live Preview
+        <!-- Processing Options -->
+        <div class="restore-options" id="restore-options">
+          <div class="restore-option selected" data-mode="restore">
+            <div class="restore-option-icon">🔧</div>
+            <h4>Restore & Repair</h4>
+            <p>Fix scratches, tears, fading, and damage</p>
+          </div>
+          <div class="restore-option" data-mode="colorize">
+            <div class="restore-option-icon">🎨</div>
+            <h4>Colorize</h4>
+            <p>Bring black & white photos to full color</p>
+          </div>
+          <div class="restore-option" data-mode="animate">
+            <div class="restore-option-icon">🎬</div>
+            <h4>Animate & Move</h4>
+            <p>Make people wave, smile, and come alive</p>
+          </div>
+          <div class="restore-option" data-mode="enhance">
+            <div class="restore-option-icon">⚡</div>
+            <h4>Enhance & Upscale</h4>
+            <p>4× resolution, sharpen faces, improve clarity</p>
+          </div>
+          <div class="restore-option" data-mode="full">
+            <div class="restore-option-icon">✨</div>
+            <h4>Full Treatment</h4>
+            <p>Restore + Colorize + Enhance all at once</p>
+          </div>
+          <div class="restore-option" data-mode="video">
+            <div class="restore-option-icon">🎞️</div>
+            <h4>Photo → Memory Video</h4>
+            <p>Turn a restored photo into a short cinematic clip</p>
+          </div>
+        </div>
+
+        <!-- Preview & Output Area -->
+        <div class="restore-preview-area" id="restore-preview-area">
+
+          <div class="restore-output-info" id="restore-output-info"></div>
+
+          <!-- Comparison view -->
+          <div class="restore-comparison" id="restore-comparison" style="display:none">
+            <div class="restore-side">
+              <div class="restore-side-label">📷 Original</div>
+              <img id="restore-original-img" src="" alt="Original">
+            </div>
+            <div class="restore-side">
+              <div class="restore-side-label" id="restore-result-label">✨ Restored</div>
+              <img id="restore-result-img" src="" alt="Result" style="display:none">
+              <video id="restore-result-video" controls loop style="display:none;width:100%;max-height:300px;background:#000"></video>
+            </div>
+          </div>
+
+          <!-- Processing state -->
+          <div class="restore-processing" id="restore-processing" style="display:none">
+            <div class="spinner"></div>
+            <div class="stage" id="restore-stage">Analyzing photo...</div>
+            <div class="restore-progress"><div class="restore-progress-bar" id="restore-progress-bar" style="width:0%"></div></div>
+            <p id="restore-stage-detail">This runs 100% locally on your machine</p>
+          </div>
+
+          <!-- Actions -->
+          <div class="restore-actions" id="restore-actions">
+            <button class="btn-restore" id="restore-go-btn">✨ Process Photo</button>
+            <button class="btn-sm" id="restore-reset-btn">↩ New Photo</button>
+            <button class="btn-sm" id="restore-download-btn" style="display:none">⬇ Download Result</button>
+            <button class="btn-sm" id="restore-share-btn" style="display:none">🔗 Save to Library</button>
+          </div>
+
+          <!-- How it works (offline instructions) -->
+          <div id="restore-how-it-works" style="margin-top:24px;background:var(--bg-2);border:1px solid var(--border);border-radius:12px;padding:20px;display:none">
+            <h3 style="font-size:14px;margin-bottom:12px">⚙️ How to enable photo processing locally</h3>
+            <div style="font-size:12px;color:var(--text-2);line-height:1.8">
+              <p><strong style="color:var(--text-0)">Restore / Enhance (GFPGAN + Real-ESRGAN):</strong></p>
+              <pre style="background:var(--bg-0);border:1px solid var(--border);border-radius:6px;padding:10px;margin:6px 0;font-size:11px">pip install basicsr facexlib realesrgan
+pip install gfpgan</pre>
+              <p style="margin-top:10px"><strong style="color:var(--text-0)">Colorize (DeOldify / DDColor):</strong></p>
+              <pre style="background:var(--bg-0);border:1px solid var(--border);border-radius:6px;padding:10px;margin:6px 0;font-size:11px">pip install deoldify
+# Or: git clone https://github.com/nicehuster/DDColor && pip install -r requirements.txt</pre>
+              <p style="margin-top:10px"><strong style="color:var(--text-0)">Animate (SadTalker / LivePortrait):</strong></p>
+              <pre style="background:var(--bg-0);border:1px solid var(--border);border-radius:6px;padding:10px;margin:6px 0;font-size:11px">git clone https://github.com/Winfredy/SadTalker
+cd SadTalker && pip install -r requirements.txt
+# Download checkpoints: bash scripts/download_models.sh</pre>
+              <p style="margin-top:10px"><strong style="color:var(--text-0)">Photo→Video (Stable Video Diffusion or AnimateDiff):</strong></p>
+              <pre style="background:var(--bg-0);border:1px solid var(--border);border-radius:6px;padding:10px;margin:6px 0;font-size:11px">pip install diffusers transformers accelerate torch
+# Model: stabilityai/stable-video-diffusion-img2vid (~25GB)</pre>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="preview-body" id="preview-body">
-      Nothing generated yet...
+    <!-- CHAT PANEL (with live preview) -->
+    <div class="panel active" id="panel-chat">
+      <div class="panel-header">
+        <h2>💬 Chat & Build</h2>
+        <div class="header-actions">
+          <button class="btn-sm" id="toggle-preview-btn">👁 Show Preview</button>
+          <button class="btn-sm voice-toggle" id="voice-chat-btn">🎙️ Hold to speak</button>
+          <button class="btn-sm" id="clear-chat">Clear</button>
+        </div>
+      </div>
+
+      <div class="builder-split">
+        <!-- Chat side -->
+        <div class="builder-chat-side">
+          <div class="chat-messages" id="chat-messages">
+            <div class="message assistant">
+              <div class="msg-avatar">✨</div>
+              <div class="msg-content">
+                <p><strong>Hey Samantha — welcome to Sam's Builder.</strong></p>
+                <p>I'm your personal offline AI builder. Everything I build shows up in the live preview on the right. Check out the <strong>📸 Photo Restore</strong> panel — I built that for you first based on your PixVerse inspiration.</p>
+                <p>Tell me what to build next. Drop a wireframe, describe an app, or say something like <em>"build me a music player like Spotify but minimal."</em></p>
+              </div>
+            </div>
+          </div>
+          <div class="attachments-strip" id="attachments-strip" style="display:none">
+            <div class="attachments-label">📎</div>
+            <div class="attachments-list" id="attachments-list"></div>
+            <button class="btn-sm" id="clear-attachments">✕</button>
+          </div>
+          <div class="chat-input-area">
+            <div class="chat-input-wrapper">
+              <button class="attach-btn" id="attach-btn">📎</button>
+              <input type="file" id="file-input" multiple accept="image/*,.zip,.csv,.json,.xml,.sql,.yaml,.yml,.js,.ts,.py,.html,.css,.md,.txt" style="display:none">
+              <textarea id="chat-input" placeholder="Describe what to build... or hold 🎙️ to speak" rows="3"></textarea>
+              <button id="send-btn" class="send-btn"><span id="send-icon">→</span></button>
+            </div>
+            <div class="chat-hints">🔒 Offline · <strong id="model-display">CodeLlama</strong> · Sam's Builder © SRL</div>
+          </div>
+        </div>
+
+        <!-- LIVE PREVIEW side -->
+        <div class="builder-preview-side" id="preview-side" style="display:none">
+          <div class="preview-tabs">
+            <button class="preview-tab active" data-ptab="preview">👁 Preview</button>
+            <button class="preview-tab" data-ptab="code">📄 Code</button>
+            <button class="preview-tab" data-ptab="console">⚡ Console</button>
+          </div>
+          <div class="preview-header">
+            <span class="preview-title" id="preview-title">No project loaded</span>
+            <div style="display:flex;gap:6px">
+              <button class="btn-sm" id="preview-refresh-btn">↺</button>
+              <button class="btn-sm" id="preview-popout-btn">⬡ Pop out</button>
+            </div>
+          </div>
+          <div class="preview-frame-wrap">
+            <div class="preview-placeholder" id="preview-placeholder">
+              <div class="preview-placeholder-icon">👁</div>
+              <p>Build something — preview appears here</p>
+              <p style="font-size:11px;margin-top:4px">HTML/CSS/JS apps render live</p>
+            </div>
+            <iframe class="preview-frame" id="preview-frame" style="display:none" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+          </div>
+          <div id="preview-code-panel" style="display:none;flex:1;overflow:hidden;flex-direction:column">
+            <textarea class="code-editor" id="preview-code-editor" placeholder="Generated code appears here..." spellcheck="false" style="flex:1"></textarea>
+          </div>
+          <div id="preview-console-panel" style="display:none;flex:1;overflow:auto;padding:10px;font-family:var(--font-mono);font-size:12px;background:var(--bg-0)">
+            <div id="preview-console-log"></div>
+          </div>
+        </div>
+      </div>
     </div>
 
-  </div>
+    <!-- VOICE PANEL -->
+    <div class="panel" id="panel-voice">
+      <div class="panel-header"><h2>🎙️ Voice Assistant</h2><span style="font-size:11px;color:var(--text-2)">© SRL · S.R.Langlois</span></div>
+      <div class="voice-content">
+        <div class="voice-conversation" id="voice-conversation">
+          <div class="voice-msg assistant"><span class="voice-avatar">✨</span><span class="voice-bubble">Hold the button and talk. I'll respond and speak back. I'm also learning your voice style.</span></div>
+        </div>
+        <div class="voice-controls">
+          <button class="voice-hold-btn" id="voice-hold-btn" onmousedown="startRecording()" onmouseup="stopRecordingAndSend()" ontouchstart="startRecording();event.preventDefault()" ontouchend="stopRecordingAndSend();event.preventDefault()">
+            <span class="voice-hold-icon">🎙️</span>
+            <span class="voice-hold-label">Hold to Talk</span>
+          </button>
+          <div class="voice-status" id="voice-status">Release to send</div>
+        </div>
+        <div class="voice-profile-mini">
+          <h4>🧠 Samantha Voice Profile</h4>
+          <div id="voice-profile-summary">Loading...</div>
+          <div class="voice-actions">
+            <button class="btn-sm" onclick="simulateMyVoice()">✍️ Write in my voice</button>
+            <button class="btn-sm" onclick="exportVoiceProfile()">📦 Export</button>
+          </div>
+        </div>
+        <div class="voice-simulate-section">
+          <h4>Write in Samantha's voice</h4>
+          <textarea id="simulate-topic" placeholder="Topic or instruction..." rows="3"></textarea>
+          <button class="btn-primary" id="simulate-btn">✍️ Generate</button>
+          <div id="simulate-result" class="simulate-result" style="display:none"></div>
+        </div>
+        <div class="voice-tts-section">
+          <h4>🔊 Have the builder speak</h4>
+          <textarea id="tts-text" placeholder="Text to speak..." rows="2"></textarea>
+          <div class="form-row" style="margin-top:8px">
+            <select id="tts-voice"><option value="en_US-lessac-medium">Lessac</option><option value="en_US-ryan-high">Ryan</option><option value="en_GB-alan-low">Alan (UK)</option></select>
+            <button class="btn-primary" id="speak-btn">🔊 Speak</button>
+          </div>
+          <audio id="tts-player" controls style="width:100%;margin-top:10px;display:none"></audio>
+        </div>
+      </div>
+    </div>
 
+    <!-- INTERNAL EDITOR -->
+    <!-- SYNTH AI PANEL -->
+    <div class="panel" id="panel-synth">
+      <div class="panel-header">
+        <h2>🤖 Synth AI</h2>
+        <div class="header-actions">
+          <span id="synth-status-badge" class="synth-badge-offline">● Connecting...</span>
+          <select id="synth-mode-select" class="synth-mode-dropdown">
+            <option value="builder">🔨 Builder</option>
+            <option value="architect">🧠 Architect</option>
+            <option value="pipeline">🚀 Pipeline</option>
+            <option value="editor">🛠 Edit Builder</option>
+            <option value="reviewer">🔬 Reviewer</option>
+          </select>
+          <select id="synth-model-select" class="synth-mode-dropdown">
+            <option value="codellama">CodeLlama</option>
+            <option value="deepseek-coder">DeepSeek Coder</option>
+            <option value="llama3">Llama 3</option>
+            <option value="mistral">Mistral</option>
+          </select>
+          <span style="font-size:11px;color:var(--text-2)">© SRL</span>
+        </div>
+      </div>
+
+      <div class="synth-layout">
+
+        <!-- LEFT: context sidebar (editor file list / project name) -->
+        <div class="synth-sidebar" id="synth-sidebar">
+
+          <div class="synth-sidebar-section" id="synth-project-ctx">
+            <div class="synth-sidebar-label">Project name</div>
+            <input id="synth-project-name" type="text" class="synth-ctx-input" placeholder="e.g. my-app">
+            <div class="synth-sidebar-label" style="margin-top:10px">Tip</div>
+            <div id="synth-mode-tip" class="synth-mode-tip-text">Describe the app you want to build.</div>
+          </div>
+
+          <div class="synth-sidebar-section" id="synth-file-ctx" style="display:none;flex:1;overflow:hidden;flex-direction:column">
+            <div class="synth-sidebar-label">Source files</div>
+            <div id="synth-file-list" style="flex:1;overflow-y:auto"></div>
+          </div>
+
+          <div class="synth-sidebar-section" id="synth-reviewer-ctx" style="display:none">
+            <div class="synth-sidebar-label">Project to review</div>
+            <input id="synth-review-project" type="text" class="synth-ctx-input" placeholder="project-name">
+            <button class="btn-primary synth-review-run-btn" id="synth-review-btn" style="margin-top:8px;width:100%;font-size:12px">🔬 Review</button>
+          </div>
+
+        </div>
+
+        <!-- RIGHT: chat area -->
+        <div class="synth-chat-area">
+
+          <!-- File preview strip (editor mode) -->
+          <div class="synth-file-strip" id="synth-file-strip" style="display:none">
+            <div class="synth-file-strip-header">
+              <span id="synth-strip-filename" class="synth-strip-name">No file open</span>
+              <div style="display:flex;gap:6px">
+                <button class="btn-sm" id="synth-strip-save-btn" style="display:none">💾 Save</button>
+                <button class="btn-sm" id="synth-strip-ask-btn">💬 Ask Synth about this</button>
+                <button class="btn-sm" id="synth-strip-close-btn">✕</button>
+              </div>
+            </div>
+            <textarea id="synth-file-editor" class="code-editor synth-file-editor" spellcheck="false"></textarea>
+          </div>
+
+          <!-- Messages -->
+          <div id="synth-messages" class="synth-messages">
+            <div class="message assistant">
+              <div class="msg-avatar">🤖</div>
+              <div class="msg-content">
+                <p><strong>Synth AI ready.</strong> Nothing gets written without your approval.</p>
+                <p>Pick a mode in the header, then describe what you want. I'll show you exactly what I plan to do — you approve or reject every change.</p>
+                <p style="color:var(--text-2);font-size:12px">🔨 Builder · 🧠 Architect · 🚀 Pipeline · 🛠 Edit Builder · 🔬 Reviewer</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Input row -->
+          <div class="synth-input-row">
+            <textarea id="synth-input" class="synth-textarea" placeholder="What do you want to build or change?" rows="2"></textarea>
+            <button id="synth-send-btn" class="send-btn" title="Send (Enter)">→</button>
+          </div>
+          <div class="synth-input-hint">
+            <span id="synth-mode-label-foot">Builder mode</span> · Nothing writes without your ✅ · © SRL
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- CREATIVE STUDIO -->
+    <div class="panel" id="panel-creative">
+      <div class="panel-header"><h2>🎨 Creative Studio</h2><span style="font-size:11px;color:var(--text-2)">All local · © SRL</span></div>
+      <div class="creative-tabs">
+        <button class="creative-tab active" data-ctab="music">🎵 Music</button>
+        <button class="creative-tab" data-ctab="image">🖼️ Image</button>
+        <button class="creative-tab" data-ctab="video">🎬 Video</button>
+        <button class="creative-tab" data-ctab="library">📚 Library</button>
+        <button class="creative-tab" data-ctab="setup">⚙️ Setup</button>
+      </div>
+      <div class="creative-panel active" id="ctab-music">
+        <div class="creative-form">
+          <h3>🎵 Music Generation <span class="badge-pill">MusicGen · Offline</span></h3>
+          <p class="form-hint">Describe the music — mood, instruments, tempo, vibe.</p>
+          <label>Prompt</label>
+          <textarea id="music-prompt" rows="3" placeholder="upbeat electronic with synths and 808s, 128bpm&#10;lo-fi hip hop, vinyl crackle, rainy day, chill&#10;epic orchestral movie trailer, brass and strings"></textarea>
+          <div class="form-row">
+            <div class="form-group"><label>Duration (sec)</label><input type="number" id="music-duration" value="15" min="5" max="60"></div>
+            <div class="form-group"><label>Model</label><select id="music-model"><option value="small">Small (fast)</option><option value="medium" selected>Medium</option><option value="large">Large (best)</option></select></div>
+            <div class="form-group"><label>Filename</label><input type="text" id="music-name" placeholder="track.wav"></div>
+          </div>
+          <button class="btn-primary" id="gen-music-btn">🎵 Generate</button>
+          <div id="music-result" class="result-area" style="display:none"></div>
+        </div>
+      </div>
+      <div class="creative-panel" id="ctab-image">
+        <div class="creative-form">
+          <h3>🖼️ Image Generation <span class="badge-pill">Stable Diffusion · Offline</span></h3>
+          <label>Prompt</label><textarea id="image-prompt" rows="3" placeholder="dark dashboard UI, neon accents&#10;app icon, minimal gradient&#10;portrait, cinematic lighting"></textarea>
+          <label>Negative</label><input type="text" id="image-negative" value="low quality, blurry">
+          <div class="form-row">
+            <div class="form-group"><label>W</label><input type="number" id="img-width" value="512"></div>
+            <div class="form-group"><label>H</label><input type="number" id="img-height" value="512"></div>
+            <div class="form-group"><label>Steps</label><input type="number" id="img-steps" value="20"></div>
+            <div class="form-group"><label>Style</label><input type="text" id="img-style" placeholder="digital art..."></div>
+          </div>
+          <div class="form-group"><label>Filename</label><input type="text" id="image-name" placeholder="image.png"></div>
+          <button class="btn-primary" id="gen-image-btn">🖼️ Generate</button>
+          <div id="image-result" class="result-area" style="display:none"></div>
+        </div>
+      </div>
+      <div class="creative-panel" id="ctab-video">
+        <div class="creative-form">
+          <h3>🎬 Video Assembly <span class="badge-pill">FFmpeg · Offline</span></h3>
+          <div id="scenes-list"></div>
+          <div class="form-row" style="margin-top:10px"><button class="btn-sm" id="add-text-scene">+ Text Slide</button><button class="btn-sm" id="add-image-scene">+ Image Clip</button></div>
+          <div class="form-row" style="margin-top:12px">
+            <div class="form-group"><label>Filename</label><input type="text" id="video-name" placeholder="output.mp4"></div>
+            <div class="form-group"><label>FPS</label><input type="number" id="video-fps" value="24"></div>
+            <div class="form-group"><label>Resolution</label><select id="video-res"><option>1280x720</option><option>1920x1080</option><option>854x480</option></select></div>
+          </div>
+          <button class="btn-primary" id="assemble-video-btn">🎬 Assemble</button>
+          <div id="video-result" class="result-area" style="display:none"></div>
+        </div>
+      </div>
+      <div class="creative-panel" id="ctab-library">
+        <div class="creative-form">
+          <h3>📚 Asset Library</h3>
+          <div class="library-section"><h4>🎵 Music</h4><div id="lib-music" class="lib-grid"></div></div>
+          <div class="library-section"><h4>🖼️ Images</h4><div id="lib-images" class="lib-grid"></div></div>
+          <div class="library-section"><h4>🎬 Videos</h4><div id="lib-videos" class="lib-grid"></div></div>
+          <button class="btn-sm" id="refresh-library">Refresh</button>
+        </div>
+      </div>
+      <div class="creative-panel" id="ctab-setup">
+        <div class="creative-form"><h3>⚙️ Setup</h3><div id="setup-info" class="setup-info">Loading...</div></div>
+      </div>
+    </div>
+
+    <!-- PROJECTS -->
+    <div class="panel" id="panel-projects">
+      <div class="panel-header">
+        <h2>📁 Projects</h2>
+        <div class="header-actions">
+          <button class="btn-sm" id="refresh-projects">🔄 Refresh</button>
+          <button class="btn-sm" id="download-active-project-btn" style="display:none">⬇ Download ZIP</button>
+        </div>
+      </div>
+      <div class="projects-grid" id="projects-grid"><div class="empty-state"><div class="empty-icon">📭</div><p>No projects yet.</p></div></div>
+    </div>
+
+    <!-- EDITOR -->
+    <div class="panel" id="panel-editor">
+      <div class="panel-header">
+        <h2>📝 Code Editor</h2>
+        <div class="header-actions">
+          <button class="btn-sm" id="save-file-btn">💾 Save</button>
+          <button class="btn-sm" id="download-editor-project-btn" style="display:none">⬇ Download ZIP</button>
+        </div>
+      </div>
+      <div class="editor-layout">
+        <div class="file-tree" id="file-tree"><div class="file-tree-empty">Open a project first</div></div>
+        <div class="editor-area"><div class="editor-tabs" id="editor-tabs"></div><textarea class="code-editor" id="code-editor" spellcheck="false"></textarea></div>
+      </div>
+    </div>
+
+    <!-- TERMINAL -->
+    <div class="panel" id="panel-terminal">
+      <div class="panel-header">
+        <h2>⚡ Terminal</h2>
+        <div class="header-actions">
+          <span class="terminal-cwd" id="terminal-cwd">workspace/</span>
+          <button class="btn-sm" id="clear-terminal">🗑 Clear</button>
+        </div>
+      </div>
+      <div class="terminal-container">
+        <div class="terminal-output" id="terminal-output"><div class="terminal-line dim">Sam's Builder Terminal — © SRL</div></div>
+        <div class="terminal-input-row"><span class="terminal-prompt">sam $</span><input type="text" id="terminal-input" autocomplete="off" placeholder="npm start, python3 restore.py, ls..."></div>
+      </div>
+    </div>
+
+    <!-- MEMORY -->
+    <div class="panel" id="panel-memory">
+      <div class="panel-header"><h2>🧠 Memory & Voice Profile</h2><button class="btn-sm" id="refresh-memory">🔄 Refresh</button></div>
+      <div class="memory-content">
+        <div class="memory-tabs">
+          <button class="memory-tab active" data-mtab="stats">📊 Stats</button>
+          <button class="memory-tab" data-mtab="voice">🎙️ Voice Profile</button>
+          <button class="memory-tab" data-mtab="builds">🏗️ Builds</button>
+        </div>
+        <div class="memory-tab-panel active" id="mtab-stats"><div class="memory-stats" id="memory-stats">Loading...</div></div>
+        <div class="memory-tab-panel" id="mtab-voice"><div id="voice-profile-full">Loading...</div></div>
+        <div class="memory-tab-panel" id="mtab-builds"><div id="memory-builds">Loading...</div></div>
+      </div>
+    </div>
+
+    <!-- TOOLS -->
+    <div class="panel" id="panel-tools">
+      <div class="panel-header"><h2>🔧 Tool Registry</h2><button class="btn-sm" id="refresh-tools">🔄 Refresh</button></div>
+      <div class="tools-info">Built-in + AI-generated tools. Sam's Builder grows its own toolbox.</div>
+      <div class="tools-grid" id="tools-grid"><div class="loading">Loading...</div></div>
+    </div>
+
+  </main>
 </div>
 
-<!-- FIXED INPUT -->
-
-<div class="chat-input-wrap">
-
-  <button
-    class="upload-btn"
-    id="upload-btn"
-  >
-    📎
-  </button>
-
-  <textarea
-    class="chat-input"
-    id="chat-input"
-    placeholder="Describe what to build..."
-  ></textarea>
-
-  <button
-    class="send-btn"
-    id="send-btn"
-  >
-    ➜
-  </button>
-
+<!-- Toast -->
+<div class="action-toast" id="action-toast" style="display:none">
+  <div class="toast-content">
+    <div class="toast-title" id="toast-title">Running...</div>
+    <div class="toast-detail" id="toast-detail"></div>
+  </div>
 </div>
+<script>/* Sam's Builder © 2026 SRL · S.R.Langlois — All rights reserved */
+/**
+ * FORGE v4 Frontend — Voice · Internal Editor · Creative · Memory
+ */
 
-<!-- FILE INPUT -->
+const state = {
+  ws: null, model: 'codellama', visionModel: 'llava',
+  chatHistory: [], internalHistory: [],
+  activeProject: null, activeFile: null,
+  streaming: false, internalStreaming: false,
+  pendingAttachments: [], scenes: [],
+  mediaRecorder: null, audioChunks: [], isRecording: false,
+  currentSelfEditFile: null, suggestedEdit: null
+};
 
-<input
-  type="file"
-  id="file-input"
-  hidden
-/>
-
-<script>
-
-/* UPLOAD */
-
-document
-.getElementById('upload-btn')
-.addEventListener('click',()=>{
-
-  document
-  .getElementById('file-input')
-  .click();
-
+document.addEventListener('DOMContentLoaded', () => {
+  initNavigation(); initChat(); initDragDrop(); initFileAttach();
+  initTerminal(); initCreative(); initVoice(); initInternalEditor();
+  connectWebSocket(); checkStatus(); loadModels();
+  loadProjects(); loadTools(); loadMemory(); loadVoiceProfile();
+  const inp = document.getElementById('chat-input');
+  inp.addEventListener('input', () => { inp.style.height='auto'; inp.style.height=Math.min(inp.scrollHeight,180)+'px'; });
 });
 
-/* FILE CHANGE */
-
-document
-.getElementById('file-input')
-.addEventListener('change',(e)=>{
-
-  const file = e.target.files[0];
-
-  if(!file) return;
-
-  document
-  .getElementById('preview-body')
-  .innerHTML = `
-    <div style="
-      padding:20px;
-      text-align:center;
-    ">
-      📁 Uploaded:
-      <br><br>
-      <strong>${file.name}</strong>
-    </div>
-  `;
-
-});
-
-/* SEND */
-
-document
-.getElementById('send-btn')
-.addEventListener('click',sendMessage);
-
-document
-.getElementById('chat-input')
-.addEventListener('keydown',(e)=>{
-
-  if(
-    e.key === 'Enter' &&
-    !e.shiftKey
-  ){
-    e.preventDefault();
-    sendMessage();
-  }
-
-});
-
-function sendMessage(){
-
-  const input = document
-    .getElementById('chat-input');
-
-  const text = input.value.trim();
-
-  if(!text) return;
-
-  document
-  .getElementById('preview-body')
-  .innerHTML = `
-    <div style="
-      padding:20px;
-      line-height:1.8;
-    ">
-      🧠 Build Request Received:
-      <br><br>
-      <strong>${text}</strong>
-      <br><br>
-      Generating preview...
-    </div>
-  `;
-
-  input.value='';
-
+// === NAV ===
+function initNavigation() {
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const p = btn.dataset.panel;
+      document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(`panel-${p}`).classList.add('active');
+      if(p==='projects') loadProjects();
+      if(p==='tools') loadTools();
+      if(p==='memory') loadMemory();
+      if(p==='voice') loadVoiceProfile();
+      if(p==='internal') loadSelfFiles();
+    });
+  });
+}
+function switchPanel(p) {
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+  document.querySelector(`[data-panel="${p}"]`)?.classList.add('active');
+  document.getElementById(`panel-${p}`)?.classList.add('active');
 }
 
-</script>
+// === WEBSOCKET ===
+function connectWebSocket() {
+  const proto = location.protocol==='https:'?'wss':'ws';
+  state.ws = new WebSocket(`${proto}://${location.host}`);
+  state.ws.onclose = () => setTimeout(connectWebSocket, 3000);
+  state.ws.onmessage = (e) => handleWSMessage(JSON.parse(e.data));
+}
 
+function handleWSMessage(data) {
+  const isInternal = state.internalStreaming;
+  switch(data.type) {
+    case 'stream': isInternal ? appendInternalStream(data.content) : appendStream(data.content); break;
+    case 'done': isInternal ? finalizeInternalStream(data.fullResponse) : finalizeStream(data.fullResponse); break;
+    case 'status': showStatusMsg(data.message, isInternal); break;
+    case 'error':
+      if(isInternal){state.internalStreaming=false;addInternalMsg('assistant',`❌ ${data.message}`);}
+      else{state.streaming=false;setSendBtnState(true);addMsg('assistant',`❌ ${data.message}`);}
+      break;
+    case 'action_start': showToast(`⚙️ ${data.action.tool}`, JSON.stringify(data.action.params||{}).substring(0,80)); break;
+    case 'action_result':
+      hideToast();
+      if(data.result?.url) showAssetInChat(data.tool, data.result);
+      if(state.activeProject) loadFileTree(state.activeProject);
+      break;
+    case 'action_error': hideToast(); break;
+    case 'building_tool': showToast('🔧 Building tool', data.name); break;
+    case 'self_edit_suggestion': handleSelfEditSuggestion(data.edit); break;
+  }
+}
+
+function showAssetInChat(tool, result) {
+  let html = '';
+  if(tool==='generate_music'&&result.url) html=`<div class="msg-asset">🎵 ${result.fileName}<audio controls src="${result.url}" style="display:block;width:100%;margin-top:6px"></audio></div>`;
+  else if(tool==='generate_image'&&result.url) html=`<div class="msg-asset">🖼️ ${result.fileName}<img src="${result.url}" style="display:block;max-width:100%;border-radius:6px;margin-top:6px"></div>`;
+  else if(tool==='assemble_video'&&result.url) html=`<div class="msg-asset">🎬 ${result.fileName}<video controls src="${result.url}" style="display:block;max-width:100%;border-radius:6px;margin-top:6px"></video></div>`;
+  if(!html) return;
+  const c=document.getElementById('chat-messages');
+  const el=document.createElement('div'); el.className='message assistant';
+  el.innerHTML=`<div class="msg-avatar">🔥</div><div class="msg-content">${html}</div>`;
+  c.appendChild(el); c.scrollTop=99999;
+}
+
+// === CHAT ===
+function initChat() {
+  document.getElementById('send-btn').addEventListener('click', sendMessage);
+  document.getElementById('chat-input').addEventListener('keydown', e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}});
+  document.getElementById('clear-chat').addEventListener('click', ()=>{document.getElementById('chat-messages').innerHTML='';state.chatHistory=[];});
+  document.getElementById('model-select').addEventListener('change', e=>{state.model=e.target.value;document.getElementById('model-display').textContent=e.target.options[e.target.selectedIndex].text;});
+  document.getElementById('vision-select').addEventListener('change', e=>{state.visionModel=e.target.value;});
+  document.getElementById('clear-attachments').addEventListener('click', clearAttachments);
+  // Voice button in chat header
+  document.getElementById('voice-chat-btn').addEventListener('mousedown', startRecording);
+  document.getElementById('voice-chat-btn').addEventListener('mouseup', stopRecordingAndSend);
+  document.getElementById('voice-chat-btn').addEventListener('touchstart', e=>{e.preventDefault();startRecording();});
+  document.getElementById('voice-chat-btn').addEventListener('touchend', e=>{e.preventDefault();stopRecordingAndSend();});
+}
+
+function sendMessage(text) {
+  if(state.streaming) return;
+  const input = document.getElementById('chat-input');
+  const message = text || input.value.trim();
+  if(!message && state.pendingAttachments.length===0) return;
+  if(!text) { input.value=''; input.style.height='auto'; }
+  addUserMessage(message, state.pendingAttachments);
+  state.chatHistory.push({role:'user',content:message||'[attachment]'});
+  const attachments=[...state.pendingAttachments]; clearAttachments();
+  state.streaming=true; setSendBtnState(false); startStreamEl('chat-messages');
+  if(state.ws?.readyState===WebSocket.OPEN) {
+    state.ws.send(JSON.stringify({type:'chat',message:message||'Analyze and build from these files.',context:state.chatHistory.slice(-12),model:state.model,visionModel:state.visionModel,attachments}));
+  }
+}
+
+function addUserMessage(text, attachments) {
+  const c=document.getElementById('chat-messages');
+  const el=document.createElement('div'); el.className='message user';
+  let att=''; for(const a of attachments){if(a.type==='image'&&a.preview)att+=`<img class="msg-image" src="${a.preview}" alt="${a.name}">`;else att+=`<div class="att-chip">${a.type==='zip'?'📦':'📄'} ${a.name}</div>`;}
+  el.innerHTML=`<div class="msg-avatar">👤</div><div class="msg-content">${att}${text?`<p>${escHtml(text)}</p>`:''}</div>`;
+  c.appendChild(el); c.scrollTop=99999;
+}
+
+function addMsg(role, content, container='chat-messages') {
+  const c=document.getElementById(container);
+  const el=document.createElement('div'); el.className=`message ${role}`;
+  el.innerHTML=`<div class="msg-avatar">${role==='user'?'👤':'🔥'}</div><div class="msg-content">${renderMd(content)}</div>`;
+  c.appendChild(el); c.scrollTop=99999;
+}
+
+let streamEl=null, streamContent='', streamContainer='chat-messages';
+function startStreamEl(container='chat-messages') {
+  streamContainer=container;
+  const el=document.getElementById('status-inline'); if(el) el.remove();
+  const c=document.getElementById(container);
+  const msg=document.createElement('div'); msg.className='message assistant';
+  msg.innerHTML=`<div class="msg-avatar">🔥</div><div class="msg-content" id="stream-el"><span class="streaming-cursor"></span></div>`;
+  c.appendChild(msg); c.scrollTop=99999;
+  streamEl=msg.querySelector('#stream-el'); streamContent='';
+}
+function appendStream(content){ if(!streamEl) return; streamContent+=content; streamEl.innerHTML=renderMd(streamContent)+'<span class="streaming-cursor"></span>'; document.getElementById(streamContainer).scrollTop=99999; }
+function finalizeStream(full){ if(streamEl){streamEl.innerHTML=renderMd(full||streamContent);streamEl.id='';streamEl=null;} state.chatHistory.push({role:'assistant',content:full||streamContent}); streamContent=''; state.streaming=false; setSendBtnState(true); if(state.activeProject) loadFileTree(state.activeProject); loadMemory(); }
+
+function showStatusMsg(text, isInternal=false) {
+  const cid = isInternal ? 'internal-chat-messages' : 'chat-messages';
+  const c=document.getElementById(cid);
+  let el=document.getElementById('status-inline'); if(el) el.remove();
+  el=document.createElement('div'); el.id='status-inline'; el.className='msg-status';
+  el.innerHTML=`⏳ ${escHtml(text)}`; c.appendChild(el); c.scrollTop=99999;
+}
+
+function setSendBtnState(en){ const btn=document.getElementById('send-btn'),icon=document.getElementById('send-icon'); btn.disabled=!en; icon.textContent=en?'→':'⏳'; }
+
+// === INTERNAL EDITOR ===
+function initInternalEditor() {
+  const inp = document.getElementById('internal-chat-input');
+  document.getElementById('internal-send-btn').addEventListener('click', sendInternalMessage);
+  inp.addEventListener('keydown', e=>{ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendInternalMessage();} });
+  document.getElementById('ask-ai-about-file').addEventListener('click', ()=>{
+    if(!state.currentSelfEditFile) return;
+    document.getElementById('internal-chat-input').value = `Explain what ${state.currentSelfEditFile} does and suggest improvements.`;
+    sendInternalMessage();
+  });
+  document.getElementById('apply-suggested-edit').addEventListener('click', applySuggestedEdit);
+}
+
+function sendInternalMessage() {
+  if(state.internalStreaming) return;
+  const inp = document.getElementById('internal-chat-input');
+  const message = inp.value.trim(); if(!message) return;
+  inp.value='';
+  addInternalMsg('user', message);
+  state.internalHistory.push({role:'user',content:message});
+  state.internalStreaming=true;
+  startStreamEl('internal-chat-messages');
+  if(state.ws?.readyState===WebSocket.OPEN) {
+    state.ws.send(JSON.stringify({type:'self_edit_chat',message,context:state.internalHistory.slice(-10),model:state.model}));
+  }
+}
+
+function addInternalMsg(role, content) { addMsg(role, content, 'internal-chat-messages'); }
+function appendInternalStream(content){ appendStream(content); } // reuses same stream vars since we set container
+function finalizeInternalStream(full){ if(streamEl){streamEl.innerHTML=renderMd(full||streamContent);streamEl.id='';streamEl=null;} state.internalHistory.push({role:'assistant',content:full||streamContent}); streamContent=''; state.internalStreaming=false; }
+
+function handleSelfEditSuggestion(edit) {
+  state.suggestedEdit = edit;
+  document.getElementById('apply-suggested-edit').style.display='inline-block';
+  addInternalMsg('assistant', `💡 I have a suggestion for **${edit.file}**: ${edit.preview || edit.instruction}\n\nClick **✅ Apply suggestion** to have me write the actual code change.`);
+}
+
+async function applySuggestedEdit() {
+  if(!state.suggestedEdit) return;
+  const edit = state.suggestedEdit;
+  showToast('🤖 Generating edit...', edit.file);
+  const res = await fetch('/api/self/suggest', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({filePath:edit.file,instruction:edit.instruction})});
+  const data = await res.json();
+  hideToast();
+  if(data.success && data.suggested) {
+    const confirm = window.confirm(`Apply AI-generated edit to ${edit.file}?\n\nMake sure to review it first. A backup will be created.`);
+    if(!confirm) return;
+    const saveRes = await fetch('/api/self/file',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({path:edit.file,content:data.suggested,reason:edit.instruction})});
+    const saved = await saveRes.json();
+    if(saved.success) { addInternalMsg('assistant', `✅ Applied to **${edit.file}**. Backup at: \`${saved.backup}\`\n\n${saved.note}`); }
+    state.suggestedEdit = null;
+    document.getElementById('apply-suggested-edit').style.display='none';
+  }
+}
+
+async function loadSelfFiles() {
+  try {
+    const r=await fetch('/api/self/files'), d=await r.json();
+    document.getElementById('self-files-list').innerHTML = d.files.map(f=>`<div class="self-file-item" onclick="openSelfFile('${f.path}')">${getIcon(f.name)} ${f.path}</div>`).join('');
+  } catch {}
+}
+
+async function openSelfFile(filePath) {
+  try {
+    const r=await fetch(`/api/self/file?path=${encodeURIComponent(filePath)}`), d=await r.json();
+    state.currentSelfEditFile = filePath;
+    document.getElementById('internal-file-name').textContent = filePath;
+    document.getElementById('internal-code-editor').value = d.content;
+    document.getElementById('internal-file-view').style.display='flex';
+    document.querySelectorAll('.self-file-item').forEach(i=>i.classList.remove('active'));
+    document.querySelector(`[onclick="openSelfFile('${filePath}')"]`)?.classList.add('active');
+  } catch {}
+}
+
+// === VOICE ===
+function initVoice() {
+  document.getElementById('voice-hold-btn').addEventListener('mousedown', startRecording);
+  document.getElementById('voice-hold-btn').addEventListener('mouseup', stopRecordingAndSend);
+  document.getElementById('voice-hold-btn').addEventListener('touchstart', e=>{e.preventDefault();startRecording();});
+  document.getElementById('voice-hold-btn').addEventListener('touchend', e=>{e.preventDefault();stopRecordingAndSend();});
+
+  document.getElementById('simulate-btn').addEventListener('click', simulateMyVoice);
+  document.getElementById('speak-btn').addEventListener('click', speakText);
+}
+
+async function startRecording() {
+  if(state.isRecording) return;
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+    state.mediaRecorder = new MediaRecorder(stream);
+    state.audioChunks = [];
+    state.mediaRecorder.ondataavailable = e => state.audioChunks.push(e.data);
+    state.mediaRecorder.start();
+    state.isRecording = true;
+    document.getElementById('voice-hold-btn').classList.add('recording');
+    document.getElementById('voice-status').textContent = '🔴 Recording...';
+    document.getElementById('voice-chat-btn').textContent = '🔴 Recording...';
+  } catch(err) {
+    showToast('Mic error', err.message);
+  }
+}
+
+async function stopRecordingAndSend() {
+  if(!state.isRecording || !state.mediaRecorder) return;
+  state.isRecording = false;
+  document.getElementById('voice-hold-btn').classList.remove('recording');
+  document.getElementById('voice-status').textContent = '⏳ Transcribing...';
+  document.getElementById('voice-chat-btn').textContent = '⏳ Thinking...';
+
+  state.mediaRecorder.stop();
+  await new Promise(r => state.mediaRecorder.addEventListener('stop', r, {once:true}));
+
+  const blob = new Blob(state.audioChunks, {type:'audio/webm'});
+  const formData = new FormData();
+  formData.append('audio', blob, 'voice.webm');
+
+  try {
+    const res = await fetch('/api/voice/transcribe', {method:'POST', body:formData});
+    const data = await res.json();
+
+    if(data.success && data.text) {
+      const text = data.text;
+      document.getElementById('voice-status').textContent = `You said: "${text}"`;
+      document.getElementById('voice-chat-btn').textContent = '🎙️ Hold to speak';
+
+      // Add to voice conversation log
+      addVoiceMsg('user', text);
+
+      // Send to main AI
+      sendMessage(text);
+
+      // After AI responds, speak it
+      state.ws.addEventListener('message', async function speakHandler(e) {
+        const msg = JSON.parse(e.data);
+        if(msg.type === 'done') {
+          state.ws.removeEventListener('message', speakHandler);
+          await speakResponse(msg.fullResponse?.substring(0, 400) || '');
+        }
+      });
+    } else {
+      document.getElementById('voice-status').textContent = data.error || 'Could not transcribe. Install Whisper: pip install openai-whisper';
+      document.getElementById('voice-chat-btn').textContent = '🎙️ Hold to speak';
+    }
+  } catch(err) {
+    document.getElementById('voice-status').textContent = `Error: ${err.message}`;
+    document.getElementById('voice-chat-btn').textContent = '🎙️ Hold to speak';
+  }
+}
+
+function stopRecording() { stopRecordingAndSend(); }
+
+async function speakResponse(text) {
+  if(!text) return;
+  const clean = text.replace(/<[^>]+>/g,'').replace(/[*_`#]/g,'').substring(0, 400);
+  try {
+    const res = await fetch('/api/voice/speak', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:clean})});
+    const data = await res.json();
+    if(data.success && data.url) {
+      const audio = new Audio(data.url); audio.play();
+    } else if(data.fallbackToBrowser) {
+      // Browser TTS fallback
+      const utt = new SpeechSynthesisUtterance(clean);
+      speechSynthesis.speak(utt);
+    }
+  } catch {}
+}
+
+async function speakText() {
+  const text = document.getElementById('tts-text').value.trim(); if(!text) return;
+  const voice = document.getElementById('tts-voice').value;
+  const res = await fetch('/api/voice/speak', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,voice})});
+  const data = await res.json();
+  if(data.success && data.url) {
+    const player = document.getElementById('tts-player');
+    player.src = data.url; player.style.display='block'; player.play();
+  } else if(data.fallbackToBrowser) {
+    const utt = new SpeechSynthesisUtterance(text); speechSynthesis.speak(utt);
+  }
+}
+
+function addVoiceMsg(role, text) {
+  const c = document.getElementById('voice-conversation');
+  const el = document.createElement('div'); el.className=`voice-msg ${role}`;
+  el.innerHTML=`<span class="voice-avatar">${role==='user'?'👤':'🔥'}</span><span class="voice-bubble">${escHtml(text)}</span>`;
+  c.appendChild(el); c.scrollTop=99999;
+}
+
+async function simulateMyVoice() {
+  const topic = document.getElementById('simulate-topic').value.trim() || 'my favorite kind of app to build';
+  const res = await fetch('/api/voice/simulate', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({profileName:'Samantha',topic})});
+  const data = await res.json();
+  const el = document.getElementById('simulate-result');
+  el.style.display='block';
+  el.innerHTML = data.success ? `<div class="simulate-text">${escHtml(data.text)}</div>` : `<div class="result-error">❌ ${data.error} — Keep chatting to build up your voice profile!</div>`;
+}
+
+async function exportVoiceProfile() {
+  const res = await fetch('/api/voice/profiles/Samantha/export', {method:'POST'});
+  const data = await res.json();
+  if(data.success) showToast('✅ Voice profile exported', data.fileName);
+  else showToast('❌ Export failed', data.error);
+}
+
+async function loadVoiceProfile() {
+  try {
+    const r = await fetch('/api/voice/profiles'), d = await r.json();
+    const p = d.profiles?.find(x=>x.name==='Samantha');
+    if(!p) { document.getElementById('voice-profile-summary').textContent = 'No profile yet — keep chatting!'; return; }
+    const style = p.style || {};
+    document.getElementById('voice-profile-summary').innerHTML=`<div class="voice-stat">Messages learned from: <strong>${p.messageCount||0}</strong></div><div class="voice-stat">Tone: <strong>${style.tone||'building...'}</strong></div><div class="voice-stat">Humor: <strong>${style.humor||'building...'}</strong></div>`;
+    // Also update full profile panel
+    document.getElementById('voice-profile-full').innerHTML=`
+      <div class="memory-stats"><div class="stat-row"><span>Messages</span><strong>${p.messageCount||0}</strong></div><div class="stat-row"><span>Samples</span><strong>${p.sampleCount||0}</strong></div><div class="stat-row"><span>Last updated</span><strong>${p.updated?new Date(p.updated).toLocaleDateString():'-'}</strong></div></div>
+      ${style.tone?`<div class="memory-section"><h3>Style Analysis</h3><div class="memory-item"><strong>Tone</strong><span>${style.tone}</span></div><div class="memory-item"><strong>Humor</strong><span>${style.humor||'-'}</span></div><div class="memory-item"><strong>Thinking style</strong><span>${style.thinkingStyle||'-'}</span></div><div class="memory-item"><strong>Personality</strong><span>${JSON.stringify(style.personalityTags||[])}</span></div><div class="memory-item"><strong>Vocabulary</strong><span>${(style.vocabulary||[]).join(', ')}</span></div></div></div>`:'<p class="dim">Keep chatting — profile builds after ~10 messages.</p>'}
+      <div class="voice-actions" style="margin-top:12px"><button class="btn-sm" onclick="simulateMyVoice()">✍️ Write in my voice</button> <button class="btn-sm" onclick="exportVoiceProfile()">📦 Export</button></div>`;
+  } catch {}
+}
+
+// === STATUS ===
+async function checkStatus() {
+  try {
+    const r=await fetch('/api/chat/health'),d=await r.json();
+    document.getElementById('ai-dot').className=`status-dot ${d.ollama?'online':'offline'}`;
+    document.getElementById('ai-text').textContent=d.ollama?'AI Online':'ollama serve';
+    checkVision(); checkVoiceSetup();
+  } catch { document.getElementById('ai-dot').className='status-dot offline'; }
+}
+async function checkVision() {
+  try { const r=await fetch('/api/chat/models'),d=await r.json(); const has=d.models?.some(m=>['llava','moondream'].some(v=>m.name.includes(v))); document.getElementById('vision-dot').className=`status-dot ${has?'online':'warn'}`; document.getElementById('vision-text').textContent=has?'Vision: Ready':'Vision: install llava'; } catch {}
+}
+async function checkVoiceSetup() {
+  try { const r=await fetch('/api/voice/setup'),d=await r.json(); const hasSTT=d.checks.whisper; const hasTTS=d.checks.piper||d.checks.espeak||d.checks.say; document.getElementById('voice-dot').className=`status-dot ${hasSTT&&hasTTS?'online':hasSTT||hasTTS?'warn':'offline'}`; document.getElementById('voice-text').textContent=hasSTT&&hasTTS?'Voice: Ready':hasSTT?'Voice: TTS needed':'Voice: install whisper'; } catch {}
+}
+async function loadModels() {
+  try { const r=await fetch('/api/chat/models'),d=await r.json(); if(!d.models) return; const ts=document.getElementById('model-select'),vs=document.getElementById('vision-select'); const et=Array.from(ts.options).map(o=>o.value),ev=Array.from(vs.options).map(o=>o.value); d.models.forEach(m=>{if(!et.includes(m.name)){const o=document.createElement('option');o.value=m.name;o.textContent=m.name;ts.appendChild(o);}if(!ev.includes(m.name)&&['llava','moondream','bakllava'].some(v=>m.name.includes(v))){const o=document.createElement('option');o.value=m.name;o.textContent=m.name;vs.appendChild(o);}}); } catch {}
+}
+
+// === PROJECTS ===
+async function loadProjects() { try{const r=await fetch('/api/apps'),d=await r.json();const g=document.getElementById('projects-grid');if(!d.projects?.length){g.innerHTML=`<div class="empty-state"><div class="empty-icon">📭</div><p>No projects yet.</p></div>`;return;}g.innerHTML=d.projects.map(p=>`<div class="project-card"><h3>📦 ${p.name}</h3><p>${p.description||'Built by FORGE'}</p><div class="project-actions"><button class="btn-open" onclick="openProject('${p.name}')">Open</button><button class="btn-sm" onclick="downloadProject('${p.name}')">Download</button><button class="btn-danger" onclick="deleteProject('${p.name}')">Delete</button></div></div>`).join('');}catch{}}
+document.getElementById('refresh-projects').addEventListener('click',loadProjects);
+function openProject(n){state.activeProject=n;document.getElementById('active-project-name').textContent=n;document.getElementById('project-context').style.display='block';document.getElementById('terminal-cwd').textContent=`workspace/${n}`;loadFileTree(n);switchPanel('editor');}
+async function loadFileTree(n){try{const r=await fetch(`/api/apps/${n}/files`),d=await r.json();document.getElementById('file-tree').innerHTML=renderTree(d.tree,n);}catch{}}
+function renderTree(items,proj,depth=0){if(!items)return'';return items.map(item=>{const pad=depth*12;if(item.type==='directory')return`<div class="tree-item tree-dir" style="padding-left:${pad+8}px">📁 ${item.name}</div>${renderTree(item.children||[],proj,depth+1)}`;return`<div class="tree-item" style="padding-left:${pad+8}px" onclick="openFile('${proj}','${item.path}')">${getIcon(item.name)} ${item.name}</div>`;}).join('');}
+function getIcon(n){const e=(n||'').split('.').pop().toLowerCase();return{js:'🟨',ts:'🔷',html:'🌐',css:'🎨',json:'📋',md:'📝',py:'🐍',sh:'⚡',sql:'🗄️',csv:'📊',wav:'🎵',mp3:'🎵',png:'🖼️',jpg:'🖼️',mp4:'🎬'}[e]||'📄';}
+async function openFile(proj,fp){try{const r=await fetch(`/api/apps/${proj}/file?path=${encodeURIComponent(fp)}`),d=await r.json();state.activeFile={project:proj,path:fp};document.getElementById('code-editor').value=d.content;const tabs=document.getElementById('editor-tabs'),tid=`tab-${fp.replace(/[\\/]/g,'-')}`;tabs.querySelectorAll('.editor-tab').forEach(t=>t.classList.remove('active'));let tab=document.getElementById(tid);if(!tab){tab=document.createElement('div');tab.className='editor-tab';tab.id=tid;tab.textContent=fp.split('/').pop();tab.addEventListener('click',()=>openFile(proj,fp));tabs.appendChild(tab);}tab.classList.add('active');}catch{}}
+document.getElementById('save-file-btn').addEventListener('click',async()=>{if(!state.activeFile)return;await fetch(`/api/apps/${state.activeFile.project}/file`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({path:state.activeFile.path,content:document.getElementById('code-editor').value})});showToast('✅ Saved',state.activeFile.path);});
+function downloadProject(n){window.open(`/api/apps/${n}/download`,'_blank');}
+async function deleteProject(n){if(!confirm(`Delete "${n}"?`))return;await fetch(`/api/apps/${n}`,{method:'DELETE'});loadProjects();}
+
+// === TERMINAL ===
+function initTerminal(){const inp=document.getElementById('terminal-input'),hist=[];let hidx=-1;inp.addEventListener('keydown',async e=>{if(e.key==='ArrowUp'){if(hidx<hist.length-1){hidx++;inp.value=hist[hidx];}return;}if(e.key==='ArrowDown'){if(hidx>0){hidx--;inp.value=hist[hidx];}else{hidx=-1;inp.value='';}return;}if(e.key!=='Enter')return;const cmd=inp.value.trim();if(!cmd)return;hist.unshift(cmd);hidx=-1;inp.value='';addTLine(`forge $ ${cmd}`,'cmd');try{const r=await fetch('/api/terminal/run',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({command:cmd,cwd:state.activeProject||''})});const d=await r.json();if(d.stdout)d.stdout.split('\n').forEach(l=>l&&addTLine(l,'stdout'));if(d.stderr)d.stderr.split('\n').forEach(l=>l&&addTLine(l,'stderr'));if(d.success&&!d.stderr)addTLine('✓','success');}catch(err){addTLine(err.message,'stderr');}});document.getElementById('clear-terminal').addEventListener('click',()=>{document.getElementById('terminal-output').innerHTML='';});}
+function addTLine(t,c=''){const o=document.getElementById('terminal-output');const l=document.createElement('div');l.className=`terminal-line ${c}`;l.textContent=t;o.appendChild(l);o.scrollTop=o.scrollHeight;}
+
+// === MEMORY ===
+async function loadMemory(){try{const r=await fetch('/api/memory'),d=await r.json();document.getElementById('memory-stats').innerHTML=`<div class="stat-row"><span>Total builds</span><strong>${d.totalBuilds}</strong></div><div class="stat-row"><span>Projects</span><strong>${d.totalProjects}</strong></div><div class="stat-row"><span>Patterns</span><strong>${d.patterns}</strong></div><div class="stat-row"><span>Music</span><strong>${d.assets.music}</strong></div><div class="stat-row"><span>Images</span><strong>${d.assets.images}</strong></div><div class="stat-row"><span>Videos</span><strong>${d.assets.videos}</strong></div>`;document.getElementById('memory-builds').innerHTML=d.recentBuilds?.length?d.recentBuilds.map(b=>`<div class="memory-item"><strong>${b.name}</strong><span>${b.type||''} · ${new Date(b.builtAt).toLocaleDateString()}</span></div>`).join(''):'<p class="dim">No builds yet</p>';loadVoiceProfile();}catch{}}
+document.getElementById('refresh-memory').addEventListener('click',loadMemory);
+document.querySelectorAll('.memory-tab').forEach(tab=>{tab.addEventListener('click',()=>{document.querySelectorAll('.memory-tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.memory-tab-panel').forEach(p=>p.classList.remove('active'));tab.classList.add('active');document.getElementById(`mtab-${tab.dataset.mtab}`).classList.add('active');});});
+
+// === TOOLS ===
+async function loadTools(){try{const r=await fetch('/api/tools'),d=await r.json();document.getElementById('tools-grid').innerHTML=d.tools.map(t=>`<div class="tool-card"><h4>${t.name}</h4><p>${t.description}</p><span class="tool-badge badge-${t.type==='built-in'?'builtin':'dynamic'}">${t.type}</span></div>`).join('');}catch{}}
+document.getElementById('refresh-tools').addEventListener('click',loadTools);
+
+// === CREATIVE ===
+function initCreative(){
+  document.querySelectorAll('.creative-tab').forEach(tab=>{tab.addEventListener('click',()=>{document.querySelectorAll('.creative-tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.creative-panel').forEach(p=>p.classList.remove('active'));tab.classList.add('active');document.getElementById(`ctab-${tab.dataset.ctab}`).classList.add('active');if(tab.dataset.ctab==='library')loadLibrary();if(tab.dataset.ctab==='setup')loadSetupInfo();});});
+  document.getElementById('gen-music-btn').addEventListener('click',async()=>{const p=document.getElementById('music-prompt').value.trim();if(!p)return;document.getElementById('gen-music-btn').textContent='⏳...';document.getElementById('gen-music-btn').disabled=true;const res=await fetch('/api/creative/music',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:p,duration:parseInt(document.getElementById('music-duration').value)||15,model:document.getElementById('music-model').value,outputName:document.getElementById('music-name').value||undefined})});const d=await res.json();document.getElementById('gen-music-btn').textContent='🎵 Generate';document.getElementById('gen-music-btn').disabled=false;const r2=document.getElementById('music-result');r2.style.display='block';if(d.success)r2.innerHTML=`<div class="result-success">✅ ${d.fileName}<audio controls src="${d.url}" style="display:block;width:100%;margin-top:6px"></audio></div>`;else r2.innerHTML=`<div class="result-error">❌ ${d.error}<pre>${d.instructions||''}</pre></div>`;});
+  document.getElementById('gen-image-btn').addEventListener('click',async()=>{const p=document.getElementById('image-prompt').value.trim();if(!p)return;document.getElementById('gen-image-btn').textContent='⏳...';document.getElementById('gen-image-btn').disabled=true;const res=await fetch('/api/creative/image',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:p,negativePrompt:document.getElementById('image-negative').value,width:parseInt(document.getElementById('img-width').value)||512,height:parseInt(document.getElementById('img-height').value)||512,steps:parseInt(document.getElementById('img-steps').value)||20,style:document.getElementById('img-style').value,outputName:document.getElementById('image-name').value||undefined})});const d=await res.json();document.getElementById('gen-image-btn').textContent='🖼️ Generate';document.getElementById('gen-image-btn').disabled=false;const r2=document.getElementById('image-result');r2.style.display='block';if(d.success)r2.innerHTML=`<div class="result-success">✅ ${d.fileName}<img src="${d.url}" style="display:block;max-width:100%;border-radius:6px;margin-top:8px"></div>`;else r2.innerHTML=`<div class="result-error">❌ ${d.error}<pre>${d.instructions||''}</pre></div>`;});
+  document.getElementById('add-text-scene').addEventListener('click',()=>{state.scenes.push({type:'text',text:'',duration:3});renderScenes();});
+  document.getElementById('add-image-scene').addEventListener('click',()=>{state.scenes.push({type:'image',imagePath:'',duration:5});renderScenes();});
+  document.getElementById('assemble-video-btn').addEventListener('click',async()=>{if(!state.scenes.length)return;document.getElementById('assemble-video-btn').textContent='⏳...';document.getElementById('assemble-video-btn').disabled=true;const res=await fetch('/api/creative/video',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({scenes:state.scenes,outputName:document.getElementById('video-name').value||undefined,fps:parseInt(document.getElementById('video-fps').value)||24,resolution:document.getElementById('video-res').value})});const d=await res.json();document.getElementById('assemble-video-btn').textContent='🎬 Assemble';document.getElementById('assemble-video-btn').disabled=false;const r2=document.getElementById('video-result');r2.style.display='block';if(d.success)r2.innerHTML=`<div class="result-success">✅ ${d.fileName}<video controls src="${d.url}" style="display:block;max-width:100%;border-radius:6px;margin-top:8px"></video></div>`;else r2.innerHTML=`<div class="result-error">❌ ${d.error}<pre>${d.instructions||''}</pre></div>`;});
+}
+function renderScenes(){document.getElementById('scenes-list').innerHTML=state.scenes.map((s,i)=>s.type==='text'?`<div class="scene-row"><span class="scene-num">${i+1}</span>📝<input type="text" placeholder="Slide text" value="${s.text}" oninput="state.scenes[${i}].text=this.value"><input type="number" value="${s.duration}" style="width:55px" oninput="state.scenes[${i}].duration=+this.value">s<button onclick="state.scenes.splice(${i},1);renderScenes()">✕</button></div>`:`<div class="scene-row"><span class="scene-num">${i+1}</span>🖼️<input type="text" placeholder="Image path" value="${s.imagePath||''}" oninput="state.scenes[${i}].imagePath=this.value"><input type="number" value="${s.duration}" style="width:55px" oninput="state.scenes[${i}].duration=+this.value">s<button onclick="state.scenes.splice(${i},1);renderScenes()">✕</button></div>`).join('');}
+async function loadLibrary(){try{const m=await(await fetch('/api/creative/music')).json();document.getElementById('lib-music').innerHTML=m.tracks?.length?m.tracks.map(t=>`<div class="lib-item"><audio controls src="${t.url}"></audio><span>${t.name}</span></div>`).join(''):'<p class="dim">None yet</p>';}catch{}try{const i=await(await fetch('/api/creative/images')).json();document.getElementById('lib-images').innerHTML=i.images?.length?i.images.map(x=>`<div class="lib-item"><img src="${x.url}" style="max-width:100%;border-radius:4px"><span>${x.name}</span></div>`).join(''):'<p class="dim">None yet</p>';}catch{}try{const v=await(await fetch('/api/creative/videos')).json();document.getElementById('lib-videos').innerHTML=v.videos?.length?v.videos.map(x=>`<div class="lib-item"><video controls src="${x.url}" style="max-width:100%;border-radius:4px"></video><span>${x.name}</span></div>`).join(''):'<p class="dim">None yet</p>';}catch{}}
+async function loadSetupInfo(){try{const r=await fetch('/api/creative/setup'),d=await r.json();document.getElementById('setup-info').innerHTML=`<h4>🎵 Music</h4><pre>${d.music}</pre><h4>🖼️ Image</h4><pre>${d.image}</pre><h4>🎬 Video</h4><pre>${d.video}</pre>`;}catch{}}
+document.getElementById('refresh-library').addEventListener('click',loadLibrary);
+
+// === DRAG & DROP / FILE ATTACH ===
+function initDragDrop(){const main=document.getElementById('main'),ov=document.getElementById('drop-overlay');main.addEventListener('dragover',e=>{e.preventDefault();ov.classList.add('visible');});main.addEventListener('dragleave',e=>{if(!main.contains(e.relatedTarget))ov.classList.remove('visible');});main.addEventListener('drop',async e=>{e.preventDefault();ov.classList.remove('visible');for(const f of Array.from(e.dataTransfer.files))await processAttachment(f);});}
+function initFileAttach(){document.getElementById('attach-btn').addEventListener('click',()=>document.getElementById('file-input').click());document.getElementById('file-input').addEventListener('change',async e=>{for(const f of Array.from(e.target.files))await processAttachment(f);e.target.value='';});}
+async function processAttachment(file){return new Promise(resolve=>{const reader=new FileReader();reader.onload=e=>{const b64=e.target.result.split(',')[1],ext=file.name.split('.').pop().toLowerCase();const isImg=file.type.startsWith('image/')||['jpg','jpeg','png','gif','webp','bmp'].includes(ext);const isZip=ext==='zip';const att={name:file.name,type:isImg?'image':isZip?'zip':'file',data:b64,encoding:'base64'};if(isImg)att.preview=e.target.result;state.pendingAttachments.push(att);renderChips();resolve();};reader.readAsDataURL(file);});}
+function renderChips(){const strip=document.getElementById('attachments-strip'),list=document.getElementById('attachments-list');if(!state.pendingAttachments.length){strip.style.display='none';return;}strip.style.display='flex';list.innerHTML=state.pendingAttachments.map((a,i)=>`<div class="attachment-chip type-${a.type}">${a.preview?`<img src="${a.preview}" alt="">`:a.type==='zip'?'📦':'📄'}<span>${a.name}</span><span class="remove-att" onclick="removeAtt(${i})">✕</span></div>`).join('');}
+function removeAtt(i){state.pendingAttachments.splice(i,1);renderChips();}
+function clearAttachments(){state.pendingAttachments=[];renderChips();}
+
+// === UTILS ===
+function renderMd(text){if(!text)return'';return text.replace(/```(\w*)\n?([\s\S]*?)```/g,(_,l,c)=>`<pre><code>${escHtml(c.trim())}</code></pre>`).replace(/`([^`]+)`/g,(_,c)=>`<code>${escHtml(c)}</code>`).replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/\*([^*]+)\*/g,'<em>$1</em>').replace(/<action>([\s\S]*?)<\/action>/g,(_,j)=>{try{const d=JSON.parse(j.trim());return`<div class="action-block"><span class="action-tool">⚙️ ${d.tool}</span><small>${escHtml(JSON.stringify(d.params||{}).substring(0,100))}</small></div>`;}catch{return'';}}).replace(/\n{2,}/g,'</p><p>').replace(/\n/g,'<br>').replace(/^/,'<p>').replace(/$/,'</p>');}
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+let toastTimer=null;
+function showToast(title,detail){document.getElementById('toast-title').textContent=title;document.getElementById('toast-detail').textContent=detail||'';document.getElementById('action-toast').style.display='flex';if(toastTimer)clearTimeout(toastTimer);}
+function hideToast(){toastTimer=setTimeout(()=>{document.getElementById('action-toast').style.display='none';},2000);}
+
+// ============================================================
+// PHOTO RESTORE APP — Sam's Builder
+// Copyright © 2026 SRL - S.R.Langlois
+// ============================================================
+
+(function initPhotoRestore() {
+  let selectedMode = 'restore';
+  let uploadedFile = null;
+  let uploadedDataURL = null;
+
+  // Option selection
+  document.querySelectorAll('.restore-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      document.querySelectorAll('.restore-option').forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      selectedMode = opt.dataset.mode;
+    });
+  });
+
+  // Upload zone
+  const zone = document.getElementById('restore-upload-zone');
+  const fileInput = document.getElementById('restore-file-input');
+
+  zone.addEventListener('click', () => fileInput.click());
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault(); zone.classList.remove('dragover');
+    const f = e.dataTransfer.files[0];
+    if (f && f.type.startsWith('image/')) loadRestoreFile(f);
+  });
+  fileInput.addEventListener('change', e => {
+    if (e.target.files[0]) loadRestoreFile(e.target.files[0]);
+  });
+
+  function loadRestoreFile(file) {
+    uploadedFile = file;
+    const reader = new FileReader();
+    reader.onload = e => {
+      uploadedDataURL = e.target.result;
+      document.getElementById('restore-original-img').src = uploadedDataURL;
+      document.getElementById('restore-comparison').style.display = 'grid';
+      document.getElementById('restore-preview-area').classList.add('visible');
+      document.getElementById('restore-download-btn').style.display = 'none';
+      document.getElementById('restore-share-btn').style.display = 'none';
+      document.getElementById('restore-result-img').style.display = 'none';
+      document.getElementById('restore-result-video').style.display = 'none';
+      document.getElementById('restore-processing').style.display = 'none';
+      document.getElementById('restore-output-info').textContent = `Loaded: ${file.name} (${(file.size/1024).toFixed(0)} KB) — Select a mode and click Process`;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // Process button
+  document.getElementById('restore-go-btn').addEventListener('click', async () => {
+    if (!uploadedFile) { showToast('⚠️ Upload a photo first', ''); return; }
+    await runRestore();
+  });
+
+  document.getElementById('restore-reset-btn').addEventListener('click', () => {
+    uploadedFile = null; uploadedDataURL = null;
+    document.getElementById('restore-preview-area').classList.remove('visible');
+    document.getElementById('restore-comparison').style.display = 'none';
+    document.getElementById('restore-how-it-works').style.display = 'none';
+    fileInput.value = '';
+  });
+
+  document.getElementById('restore-download-btn').addEventListener('click', () => {
+    const img = document.getElementById('restore-result-img');
+    const vid = document.getElementById('restore-result-video');
+    if (img.style.display !== 'none' && img.src) {
+      const a = document.createElement('a'); a.href = img.src;
+      a.download = `restored_${Date.now()}.png`; a.click();
+    } else if (vid.style.display !== 'none' && vid.src) {
+      const a = document.createElement('a'); a.href = vid.src;
+      a.download = `memory_video_${Date.now()}.mp4`; a.click();
+    }
+  });
+
+  async function runRestore() {
+    const processing = document.getElementById('restore-processing');
+    const goBtn = document.getElementById('restore-go-btn');
+    const stages = getModeStages(selectedMode);
+    
+    processing.style.display = 'block';
+    goBtn.disabled = true;
+    document.getElementById('restore-result-img').style.display = 'none';
+    document.getElementById('restore-result-video').style.display = 'none';
+
+    // Animate through stages
+    for (let i = 0; i < stages.length; i++) {
+      document.getElementById('restore-stage').textContent = stages[i].label;
+      document.getElementById('restore-stage-detail').textContent = stages[i].detail;
+      const pct = Math.round(((i + 1) / stages.length) * 100);
+      document.getElementById('restore-progress-bar').style.width = pct + '%';
+      await sleep(stages[i].duration);
+    }
+
+    // Try to call server endpoint
+    try {
+      const formData = new FormData();
+      formData.append('photo', uploadedFile);
+      formData.append('mode', selectedMode);
+
+      const response = await fetch('/api/restore/process', { method: 'POST', body: formData });
+      
+      if (response.ok) {
+        const data = await response.json();
+        processing.style.display = 'none';
+        goBtn.disabled = false;
+        
+        const modeIsVideo = selectedMode === 'animate' || selectedMode === 'video';
+        if (modeIsVideo && data.videoUrl) {
+          const vid = document.getElementById('restore-result-video');
+          vid.src = data.videoUrl; vid.style.display = 'block';
+          document.getElementById('restore-result-label').textContent = '🎬 Animated';
+        } else if (data.imageUrl) {
+          const img = document.getElementById('restore-result-img');
+          img.src = data.imageUrl; img.style.display = 'block';
+          document.getElementById('restore-result-label').textContent = getModeLabel(selectedMode);
+        }
+        document.getElementById('restore-download-btn').style.display = 'inline-block';
+        document.getElementById('restore-share-btn').style.display = 'inline-block';
+        document.getElementById('restore-output-info').innerHTML = `<strong style="color:var(--green)">✅ Processing complete!</strong> Mode: ${getModeLabel(selectedMode)}`;
+      } else {
+        throw new Error('Server returned ' + response.status);
+      }
+    } catch (err) {
+      // Server endpoint not available yet — show install instructions
+      processing.style.display = 'none';
+      goBtn.disabled = false;
+      document.getElementById('restore-output-info').innerHTML = `<strong style="color:var(--yellow)">⚙️ Local AI not installed yet.</strong> See setup instructions below to enable ${getModeLabel(selectedMode)}.`;
+      document.getElementById('restore-how-it-works').style.display = 'block';
+      // Still show original as placeholder
+      const img = document.getElementById('restore-result-img');
+      img.src = uploadedDataURL;
+      img.style.display = 'block';
+      img.style.opacity = '0.5';
+      document.getElementById('restore-result-label').textContent = '⚙️ Processing Unavailable';
+    }
+  }
+
+  function getModeStages(mode) {
+    const baseStages = {
+      restore: [
+        { label: 'Analyzing damage...', detail: 'Detecting scratches, tears, fading', duration: 800 },
+        { label: 'Running GFPGAN face restoration...', detail: 'Restoring facial features with AI', duration: 1200 },
+        { label: 'Applying Real-ESRGAN upscaling...', detail: 'Enhancing resolution 4×', duration: 1000 },
+        { label: 'Finishing touches...', detail: 'Color balancing and sharpening', duration: 600 },
+      ],
+      colorize: [
+        { label: 'Analyzing black & white tones...', detail: 'Building grayscale map', duration: 600 },
+        { label: 'Running DeOldify colorization...', detail: 'AI predicting original colors', duration: 1500 },
+        { label: 'Refining skin tones...', detail: 'Adjusting color accuracy', duration: 800 },
+        { label: 'Final color grading...', detail: 'Natural look processing', duration: 500 },
+      ],
+      animate: [
+        { label: 'Detecting faces...', detail: 'Finding subjects to animate', duration: 700 },
+        { label: 'Running SadTalker/LivePortrait...', detail: 'Generating natural movement', duration: 2000 },
+        { label: 'Rendering animation frames...', detail: 'Building motion sequence', duration: 1200 },
+        { label: 'Encoding video...', detail: 'FFmpeg MP4 export', duration: 600 },
+      ],
+      enhance: [
+        { label: 'Detecting faces...', detail: 'Locating subjects', duration: 500 },
+        { label: 'GFPGAN face enhancement...', detail: 'Reconstructing details', duration: 1200 },
+        { label: 'Real-ESRGAN 4× upscale...', detail: 'Increasing resolution', duration: 1000 },
+        { label: 'Noise reduction...', detail: 'Cleaning artifacts', duration: 600 },
+      ],
+      full: [
+        { label: 'Repairing damage...', detail: 'GFPGAN restoration pass', duration: 900 },
+        { label: 'Colorizing...', detail: 'DeOldify color prediction', duration: 1200 },
+        { label: 'Upscaling 4×...', detail: 'Real-ESRGAN enhancement', duration: 1000 },
+        { label: 'Combining all passes...', detail: 'Full treatment merge', duration: 700 },
+      ],
+      video: [
+        { label: 'Restoring source image...', detail: 'Full treatment pass', duration: 1000 },
+        { label: 'Stable Video Diffusion...', detail: 'Generating cinematic motion', duration: 2500 },
+        { label: 'Adding depth of field...', detail: 'Cinematic finishing', duration: 800 },
+        { label: 'Encoding memory video...', detail: 'Final MP4 export', duration: 600 },
+      ],
+    };
+    return baseStages[mode] || baseStages.restore;
+  }
+
+  function getModeLabel(mode) {
+    return { restore:'🔧 Restored', colorize:'🎨 Colorized', animate:'🎬 Animated', enhance:'⚡ Enhanced', full:'✨ Full Treatment', video:'🎞️ Memory Video' }[mode] || '✨ Processed';
+  }
+
+  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+})();
+
+// ============================================================
+// LIVE PREVIEW PANEL
+// ============================================================
+
+(function initLivePreview() {
+  let previewVisible = false;
+
+  document.getElementById('toggle-preview-btn').addEventListener('click', () => {
+    previewVisible = !previewVisible;
+    const side = document.getElementById('preview-side');
+    const btn = document.getElementById('toggle-preview-btn');
+    side.style.display = previewVisible ? 'flex' : 'none';
+    btn.textContent = previewVisible ? '👁 Hide Preview' : '👁 Show Preview';
+  });
+
+  // Preview tabs
+  document.querySelectorAll('.preview-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.preview-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const which = tab.dataset.ptab;
+      document.getElementById('preview-frame').style.display = which === 'preview' ? 'block' : 'none';
+      document.getElementById('preview-placeholder').style.display = 'none';
+      document.getElementById('preview-code-panel').style.display = which === 'code' ? 'flex' : 'none';
+      document.getElementById('preview-console-panel').style.display = which === 'console' ? 'block' : 'none';
+    });
+  });
+
+  document.getElementById('preview-refresh-btn').addEventListener('click', refreshPreview);
+  document.getElementById('preview-popout-btn').addEventListener('click', () => {
+    const src = document.getElementById('preview-frame').src;
+    if (src && src !== 'about:blank') window.open(src, '_blank');
+    else showToast('No preview loaded', 'Build something first');
+  });
+
+  // Called when a project file is created/updated — auto-refresh preview
+  window.updateLivePreview = function(projectName, htmlContent) {
+    if (!previewVisible) return;
+    const frame = document.getElementById('preview-frame');
+    const placeholder = document.getElementById('preview-placeholder');
+    document.getElementById('preview-title').textContent = projectName || 'Preview';
+
+    if (htmlContent) {
+      // Inject directly as srcdoc
+      frame.srcdoc = htmlContent;
+      frame.style.display = 'block';
+      placeholder.style.display = 'none';
+      document.getElementById('preview-code-editor').value = htmlContent;
+    } else if (projectName) {
+      // Try to load the index.html from the project via API
+      fetch(`/api/apps/${projectName}/file?path=index.html`)
+        .then(r => r.json())
+        .then(d => {
+          if (d.content) {
+            frame.srcdoc = d.content;
+            frame.style.display = 'block';
+            placeholder.style.display = 'none';
+            document.getElementById('preview-code-editor').value = d.content;
+          }
+        }).catch(() => {});
+    }
+  };
+
+  function refreshPreview() {
+    const projectName = document.getElementById('active-project-name')?.textContent;
+    if (projectName && projectName !== '—') window.updateLivePreview(projectName);
+  }
+
+  // Hook into action results to auto-preview on project creation
+  const origHandle = window.handleWSMessage;
+  window.handleWSMessage = function(data) {
+    if (origHandle) origHandle(data);
+    if (data.type === 'action_result' && data.result?.success && data.result?.project) {
+      setTimeout(() => window.updateLivePreview(data.result.project), 500);
+    }
+    if (data.type === 'action_result' && data.tool === 'create_file' && previewVisible) {
+      const proj = document.getElementById('active-project-name')?.textContent;
+      if (proj && proj !== '—') setTimeout(() => window.updateLivePreview(proj), 300);
+    }
+  };
+})();
+
+// ============================================================
+// INIT — switch to Photo Restore by default on first visit
+// ============================================================
+// Uncomment to open Photo Restore first:
+// document.addEventListener('DOMContentLoaded', () => switchPanel('restore'));
+
+// ============================================================
+// BUILD APP FROM TEMPLATE
+// Copyright © 2026 SRL - S.R.Langlois
+// ============================================================
+
+(function initBuildFromTemplate() {
+  const buildBtn = document.getElementById('build-restore-app-btn');
+  if (!buildBtn) return;
+
+  buildBtn.addEventListener('click', async () => {
+    buildBtn.textContent = '⏳ Building...';
+    buildBtn.disabled = true;
+
+    try {
+      const res  = await fetch('/api/apps/build', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ template: 'memory-revival-studio' })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        buildBtn.textContent = '✅ Built!';
+        buildBtn.style.background = 'var(--green)';
+
+        // Show success toast
+        showToast('✅ App Built!', `${data.project} · ${data.files.length} files written`);
+
+        // Load into preview
+        if (window.updateLivePreview) {
+          // Fetch the built HTML to inject into preview
+          const previewRes = await fetch(`/api/apps/${data.project}/file?path=public/index.html`);
+          const previewData = await previewRes.json();
+          if (previewData.content) {
+            window.updateLivePreview(data.project, previewData.content);
+            // Make sure preview is visible
+            const previewSide = document.getElementById('preview-side');
+            const toggleBtn   = document.getElementById('toggle-preview-btn');
+            if (previewSide && previewSide.style.display === 'none') {
+              previewSide.style.display = 'flex';
+              if (toggleBtn) toggleBtn.textContent = '👁 Hide Preview';
+            }
+            // Switch to chat panel to show preview
+            switchPanel('chat');
+          }
+        }
+
+        // Open project in editor too
+        state.activeProject = data.project;
+        if (document.getElementById('active-project-name')) {
+          document.getElementById('active-project-name').textContent = data.project;
+          document.getElementById('project-context').style.display = 'block';
+        }
+
+        // Add a message to chat explaining the build
+        setTimeout(() => {
+          addMsg('assistant',
+            `✅ **Memory Revival Studio built successfully!**\n\n` +
+            `📁 **Project:** \`workspace/${data.project}/\`\n\n` +
+            `**Files created (${data.files.length}):**\n${data.files.map(f => '- \`'+f+'\`').join('\n')}\n\n` +
+            `**To run it locally:**\n\`\`\`bash\ncd workspace/${data.project}\npip install -r requirements.txt\npython3 server.py\n# Then open http://localhost:5050\n\`\`\`\n\n` +
+            `The live preview above shows the frontend. The Python server handles all AI processing when you run it.`,
+            'chat-messages'
+          );
+        }, 500);
+
+      } else {
+        buildBtn.textContent = '🔨 Build This App';
+        buildBtn.disabled = false;
+        showToast('❌ Build failed', data.error || 'Unknown error');
+      }
+    } catch (err) {
+      buildBtn.textContent = '🔨 Build This App';
+      buildBtn.disabled = false;
+      showToast('❌ Error', err.message);
+    }
+  });
+})();
+
+
+
+
+// ============================================================
+// SYNTH AI v2 — Approval-gated internal brain
+// Copyright © 2026 SRL - S.R.Langlois. All rights reserved.
+// Nothing writes to disk without Samantha's explicit approval.
+// ============================================================
+
+(function initSynthV2() {
+  'use strict';
+
+  let synthWs      = null;
+  let synthMode    = 'builder';
+  let synthCtx     = [];
+  let isStreaming  = false;
+  let streamEl     = null;          // current streaming msg element
+  let openFilePath = null;
+
+  // ── DOM refs ──────────────────────────────────────────────────
+  const modeSelect    = () => document.getElementById('synth-mode-select');
+  const modelSelect   = () => document.getElementById('synth-model-select');
+  const inputEl       = () => document.getElementById('synth-input');
+  const sendBtn       = () => document.getElementById('synth-send-btn');
+  const msgContainer  = () => document.getElementById('synth-messages');
+  const statusBadge   = () => document.getElementById('synth-status-badge');
+  const modeFootLabel = () => document.getElementById('synth-mode-label-foot');
+
+  // ── WebSocket ─────────────────────────────────────────────────
+  function connectSynth() {
+    if (synthWs && synthWs.readyState <= WebSocket.OPEN) return;
+    const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+    synthWs = new WebSocket(`${proto}://${location.host}/synth`);
+
+    synthWs.onopen  = () => setBadge('online', '● Synth Online');
+    synthWs.onclose = () => { setBadge('offline', '● Disconnected'); setTimeout(connectSynth, 4000); };
+    synthWs.onerror = () => setBadge('warn', '● Error');
+    synthWs.onmessage = e => { try { handleMsg(JSON.parse(e.data)); } catch {} };
+  }
+
+  function setBadge(state, text) {
+    const b = statusBadge();
+    if (!b) return;
+    b.textContent = text;
+    b.className = { online: 'synth-badge-online', warn: 'synth-badge-warn' }[state] || 'synth-badge-offline';
+  }
+
+  // ── Mode switching ────────────────────────────────────────────
+  const MODE_TIPS = {
+    builder:   'Describe the app you want. I\'ll show all planned files — you choose which to write.',
+    architect: 'Describe your idea. I\'ll design the full structure first, then you decide to build.',
+    pipeline:  'Full automatic: Architect → Build → Review. All changes require your approval.',
+    editor:    'Pick a file on the left. Ask me to change anything in Sam\'s Builder. I\'ll propose edits for your review.',
+    reviewer:  'Enter a project name and click Review. I\'ll audit the code for bugs and missing logic.'
+  };
+  const MODE_PLACEHOLDERS = {
+    builder:   'Describe the app... (e.g. "a task tracker with tags and drag-and-drop")',
+    architect: 'Describe your idea... I\'ll produce a full spec before any code',
+    pipeline:  'Describe the app... I\'ll handle everything and ask for your approval',
+    editor:    'What do you want to change in Sam\'s Builder?',
+    reviewer:  'Enter the project name on the left, then click Review'
+  };
+
+  if (modeSelect()) {
+    modeSelect().addEventListener('change', () => {
+      synthMode = modeSelect().value;
+      updateModeUI();
+    });
+  }
+
+  function updateModeUI() {
+    const m = synthMode;
+    if (modeFootLabel()) modeFootLabel().textContent = {
+      builder: 'Builder', architect: 'Architect', pipeline: 'Pipeline',
+      editor: 'Edit Builder', reviewer: 'Reviewer'
+    }[m] || m;
+
+    const tip = document.getElementById('synth-mode-tip');
+    if (tip) tip.textContent = MODE_TIPS[m] || '';
+    const inp = inputEl();
+    if (inp) inp.placeholder = MODE_PLACEHOLDERS[m] || 'What do you want?';
+
+    // Sidebar context panels
+    const projCtx     = document.getElementById('synth-project-ctx');
+    const fileCtx     = document.getElementById('synth-file-ctx');
+    const reviewCtx   = document.getElementById('synth-reviewer-ctx');
+    const fileStrip   = document.getElementById('synth-file-strip');
+
+    [projCtx, fileCtx, reviewCtx].forEach(el => { if (el) el.style.display = 'none'; });
+    if (fileStrip) fileStrip.style.display = 'none';
+
+    if (m === 'editor') {
+      if (fileCtx)  fileCtx.style.display  = 'flex';
+      if (fileStrip) fileStrip.style.display = 'flex';
+      loadFileList();
+    } else if (m === 'reviewer') {
+      if (reviewCtx) reviewCtx.style.display = 'block';
+    } else {
+      if (projCtx) projCtx.style.display = 'block';
+    }
+  }
+
+  // ── File list (editor mode) ───────────────────────────────────
+  async function loadFileList() {
+    const list = document.getElementById('synth-file-list');
+    if (!list) return;
+    list.innerHTML = '<div style="padding:8px;font-size:11px;color:var(--text-2)">Loading...</div>';
+    try {
+      const res  = await fetch('/api/synth/editor/files');
+      const data = await res.json();
+      const groups = {};
+      (data.files || []).forEach(f => {
+        const g = f.dir || 'root';
+        (groups[g] = groups[g] || []).push(f);
+      });
+      list.innerHTML = Object.entries(groups).map(([grp, files]) =>
+        `<div class="synth-file-group-label">${grp}</div>` +
+        files.map(f =>
+          `<div class="synth-file-item-v2" data-path="${f.path}" title="${f.path}">${f.name}</div>`
+        ).join('')
+      ).join('');
+      list.querySelectorAll('.synth-file-item-v2').forEach(item => {
+        item.addEventListener('click', () => openFile(item.dataset.path, item));
+      });
+    } catch {
+      list.innerHTML = '<div style="padding:8px;font-size:11px;color:var(--red)">Server offline</div>';
+    }
+  }
+
+  async function openFile(filePath, itemEl) {
+    document.querySelectorAll('.synth-file-item-v2').forEach(i => i.classList.remove('active'));
+    if (itemEl) itemEl.classList.add('active');
+    openFilePath = filePath;
+    const strip  = document.getElementById('synth-file-strip');
+    const editor = document.getElementById('synth-file-editor');
+    const nameEl = document.getElementById('synth-strip-filename');
+    const saveBtn = document.getElementById('synth-strip-save-btn');
+
+    try {
+      const res  = await fetch(`/api/synth/editor/file?filePath=${encodeURIComponent(filePath)}`);
+      const data = await res.json();
+      if (editor) editor.value = data.content || '';
+      if (nameEl) nameEl.textContent = filePath;
+      if (strip)  strip.style.display = 'flex';
+      if (saveBtn) saveBtn.style.display = 'inline-block';
+    } catch (err) {
+      appendMsg('assistant', `❌ Could not read ${filePath}: ${err.message}`);
+    }
+  }
+
+  // Strip controls
+  document.getElementById('synth-strip-save-btn')?.addEventListener('click', async () => {
+    if (!openFilePath) return;
+    const content = document.getElementById('synth-file-editor')?.value || '';
+    try {
+      const res  = await fetch('/api/synth/editor/write', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filePath: openFilePath, content, reason: 'Direct manual edit' })
+      });
+      const data = await res.json();
+      showToast(data.success ? '💾 Saved' : '❌ Failed', openFilePath + (data.restart ? ' — restart server' : ''));
+    } catch (err) { showToast('❌', err.message); }
+  });
+
+  document.getElementById('synth-strip-ask-btn')?.addEventListener('click', () => {
+    if (!openFilePath) return;
+    const inp = inputEl();
+    if (inp) { inp.value = `Explain what ${openFilePath} does and suggest any improvements.`; inp.focus(); }
+  });
+
+  document.getElementById('synth-strip-close-btn')?.addEventListener('click', () => {
+    const strip = document.getElementById('synth-file-strip');
+    if (strip) strip.style.display = 'none';
+    openFilePath = null;
+  });
+
+  // ── Review button ─────────────────────────────────────────────
+  document.getElementById('synth-review-btn')?.addEventListener('click', async () => {
+    const projName = document.getElementById('synth-review-project')?.value?.trim();
+    const model    = modelSelect()?.value || 'codellama';
+    if (!projName) { showToast('⚠️', 'Enter a project name first'); return; }
+    const btn = document.getElementById('synth-review-btn');
+    btn.disabled = true; btn.textContent = '⏳ Reviewing...';
+    try {
+      const res  = await fetch('/api/synth/review', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ projectName: projName, model })
+      });
+      const data = await res.json();
+      btn.disabled = false; btn.textContent = '🔬 Review';
+      if (data.review) appendReviewCard(data.review);
+      else appendMsg('assistant', data.raw || data.error || 'Review complete');
+    } catch (err) {
+      btn.disabled = false; btn.textContent = '🔬 Review';
+      appendMsg('assistant', `❌ ${err.message}`);
+    }
+  });
+
+  // ── Send ──────────────────────────────────────────────────────
+  sendBtn()?.addEventListener('click', sendSynth);
+  inputEl()?.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendSynth(); }
+  });
+  inputEl()?.addEventListener('input', () => {
+    const el = inputEl(); if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 160) + 'px';
+  });
+
+  function sendSynth() {
+    if (isStreaming) return;
+    const msg = inputEl()?.value?.trim();
+    if (!msg) return;
+    if (!synthWs || synthWs.readyState !== WebSocket.OPEN) {
+      appendMsg('assistant', '❌ Synth not connected. Make sure the server is running (`npm start`).');
+      return;
+    }
+
+    appendMsg('user', msg);
+    inputEl().value = ''; inputEl().style.height = '42px';
+    synthCtx.push({ role: 'user', content: msg });
+    isStreaming = true; streamEl = null;
+    if (sendBtn()) sendBtn().disabled = true;
+
+    const model = modelSelect()?.value || 'codellama';
+    const proj  = document.getElementById('synth-project-name')?.value?.trim() || '';
+
+    synthWs.send(JSON.stringify({
+      type:     synthMode === 'pipeline' ? 'pipeline' : 'synth_chat',
+      mode:     synthMode,
+      message:  msg + (proj ? `\nProject name: ${proj}` : ''),
+      context:  synthCtx.slice(-10),
+      model,
+      openFile: openFilePath || undefined
+    }));
+  }
+
+  // ── Incoming WS messages ──────────────────────────────────────
+  function handleMsg(d) {
+    switch (d.type) {
+
+      case 'synth_ready':
+        setBadge('online', '● Synth Online');
+        break;
+
+      case 'synth_start':
+        streamEl = appendStreamingMsg(d.mode);
+        break;
+
+      case 'synth_stream':
+        if (!streamEl) streamEl = appendStreamingMsg(synthMode);
+        appendToStream(streamEl, d.content);
+        break;
+
+      case 'synth_status':
+      case 'synth_pipeline_stage':
+        appendMsg('assistant', `<em style="color:var(--accent)">${escHtml(d.message || '')}</em>`, true);
+        break;
+
+      case 'synth_spec':
+        appendSpecCard(d.spec);
+        break;
+
+      // THE KEY EVENT — show approval card, don't write anything
+      case 'synth_approval_required':
+        appendApprovalCard(d);
+        break;
+
+      case 'synth_review':
+        appendReviewCard(d.review);
+        break;
+
+      case 'synth_edit_blocked':
+        appendMsg('assistant', `⛔ Blocked: \`${d.path}\` — ${d.reason}`);
+        break;
+
+      case 'synth_done':
+      case 'synth_pipeline_done':
+        isStreaming = false; streamEl = null;
+        if (sendBtn()) sendBtn().disabled = false;
+        if (d.fullResponse) synthCtx.push({ role: 'assistant', content: d.fullResponse.substring(0, 1500) });
+        break;
+
+      case 'synth_error':
+        isStreaming = false; streamEl = null;
+        if (sendBtn()) sendBtn().disabled = false;
+        appendMsg('assistant', `❌ ${d.message || 'Synth error'}`);
+        break;
+    }
+  }
+
+  // ── Approval card ─────────────────────────────────────────────
+  function appendApprovalCard(d) {
+    const container = msgContainer();
+    if (!container) return;
+
+    const isBuild = d.kind === 'build';
+    const files   = d.files || [];
+
+    const cardEl = document.createElement('div');
+    cardEl.className = 'message assistant';
+    cardEl.innerHTML = `<div class="msg-avatar">🤖</div><div class="msg-content" style="max-width:100%;flex:1"></div>`;
+    const body = cardEl.querySelector('.msg-content');
+
+    body.innerHTML = `
+      <div class="synth-approval-card" id="card-${d.approvalId}">
+        <div class="synth-approval-header">
+          <div>
+            <span class="synth-approval-kind">${isBuild ? 'BUILD' : 'EDIT'}</span>
+            <span class="synth-approval-title" style="margin-left:8px">${escHtml(d.summary || 'Changes ready')}</span>
+          </div>
+          <span style="font-size:12px;color:var(--text-2)">${files.length} file${files.length!==1?'s':''}</span>
+        </div>
+        <div class="synth-approval-body">
+          <div style="font-size:12px;color:var(--text-2);margin-bottom:10px">
+            ✋ <strong>Nothing has been written yet.</strong> Select the files you want and click Approve.
+          </div>
+          <div class="synth-file-checklist" id="checklist-${d.approvalId}">
+            ${files.map(f => `
+              <div class="synth-file-check-item">
+                <input type="checkbox" checked class="synth-check" data-path="${escAttr(f.path)}">
+                <span class="synth-check-path">${escHtml(f.path)}</span>
+                <span class="synth-check-size">${f.size ? (f.size/1024).toFixed(1)+'KB' : ''}</span>
+                ${f.reason ? `<span class="synth-check-reason">${escHtml(f.reason)}</span>` : ''}
+                <button class="synth-preview-btn" data-approval="${d.approvalId}" data-path="${escAttr(f.path)}">👁 Preview</button>
+              </div>
+              <pre class="synth-code-preview" id="prev-${d.approvalId}-${CSS.escape(f.path).replace(/\\/g,'_')}"></pre>
+            `).join('')}
+          </div>
+          <div class="synth-approval-actions">
+            <button class="synth-approve-btn" data-approval="${d.approvalId}" data-kind="${d.kind}">✅ Approve & Write</button>
+            <button class="synth-reject-btn"  data-approval="${d.approvalId}">❌ Reject All</button>
+            <button class="synth-select-all-btn" data-approval="${d.approvalId}">☑ Select All</button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    container.appendChild(cardEl);
+    container.scrollTop = container.scrollHeight;
+
+    // Wire up buttons
+    body.querySelectorAll('.synth-preview-btn').forEach(btn => {
+      btn.addEventListener('click', () => previewFile(btn.dataset.approval, btn.dataset.path));
+    });
+
+    body.querySelector(`.synth-approve-btn`)?.addEventListener('click', async (e) => {
+      const approvalId  = e.target.dataset.approval;
+      const kind        = e.target.dataset.kind;
+      const selected    = [...body.querySelectorAll('.synth-check:checked')].map(cb => cb.dataset.path);
+      if (!selected.length) { showToast('⚠️', 'Select at least one file'); return; }
+      e.target.disabled = true;
+      e.target.textContent = '⏳ Writing...';
+      await applyApproval(approvalId, selected, kind, body);
+    });
+
+    body.querySelector(`.synth-reject-btn`)?.addEventListener('click', async (e) => {
+      const approvalId = e.target.dataset.approval;
+      await fetch('/api/synth/reject', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ approvalId }) });
+      const card = body.querySelector(`#card-${approvalId}`);
+      if (card) {
+        card.style.borderColor = 'var(--red)';
+        card.querySelector('.synth-approval-actions').innerHTML =
+          `<span style="color:var(--red);font-size:13px">❌ Rejected — nothing was written.</span>`;
+      }
+      showToast('❌ Rejected', 'No files were written');
+    });
+
+    body.querySelector(`.synth-select-all-btn`)?.addEventListener('click', (e) => {
+      const checks = body.querySelectorAll('.synth-check');
+      const allChecked = [...checks].every(c => c.checked);
+      checks.forEach(c => c.checked = !allChecked);
+      e.target.textContent = allChecked ? '☑ Select All' : '☐ Deselect All';
+    });
+  }
+
+  async function previewFile(approvalId, filePath) {
+    const safePid = CSS.escape(filePath).replace(/\\/g, '_');
+    const prevEl  = document.getElementById(`prev-${approvalId}-${safePid}`);
+    if (!prevEl) return;
+    if (prevEl.style.display === 'block') { prevEl.style.display = 'none'; return; }
+    prevEl.textContent = 'Loading...'; prevEl.style.display = 'block';
+    try {
+      const res  = await fetch(`/api/synth/pending/${approvalId}/file?path=${encodeURIComponent(filePath)}`);
+      const data = await res.json();
+      prevEl.textContent = data.content || '(empty)';
+    } catch { prevEl.textContent = 'Preview unavailable — run the server to see file contents'; }
+  }
+
+  async function applyApproval(approvalId, selectedFiles, kind, body) {
+    try {
+      const res  = await fetch('/api/synth/apply', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ approvalId, selectedFiles })
+      });
+      const data = await res.json();
+      const card = body.querySelector(`#card-${approvalId}`);
+
+      if (data.success) {
+        const ok   = (data.results || []).filter(r => r.success);
+        const fail = (data.results || []).filter(r => !r.success);
+
+        if (card) {
+          card.style.borderColor = 'var(--green)';
+          card.querySelector('.synth-approval-actions').innerHTML = `
+            <div class="synth-approval-done">
+              ${ok.map(r   => `<div class="synth-applied-ok">✅ ${escHtml(r.path)}</div>`).join('')}
+              ${fail.map(r => `<div class="synth-applied-no">❌ ${escHtml(r.path)}: ${escHtml(r.error||'')}</div>`).join('')}
+              ${data.needsRestart ? '<div style="color:var(--yellow);margin-top:6px">⚠️ Restart the server to apply backend changes: <code>npm start</code></div>' : ''}
+            </div>
+          `;
+        }
+
+        showToast(`✅ ${ok.length} file${ok.length!==1?'s':''} written`, kind === 'build' ? `Project: ${data.project}` : 'Sam\'s Builder updated');
+
+        // Auto-preview built project
+        if (kind === 'build' && data.project && window.updateLivePreview) {
+          setTimeout(() => {
+            window.updateLivePreview(data.project);
+            const side = document.getElementById('preview-side');
+            if (side && side.style.display === 'none') {
+              side.style.display = 'flex';
+              const tb = document.getElementById('toggle-preview-btn');
+              if (tb) tb.textContent = '👁 Hide Preview';
+            }
+          }, 600);
+        }
+        synthCtx.push({ role: 'assistant', content: `Applied ${ok.length} file(s) successfully.` });
+      } else {
+        showToast('❌ Apply failed', data.error || 'Unknown error');
+        const ab = body.querySelector('.synth-approve-btn');
+        if (ab) { ab.disabled = false; ab.textContent = '✅ Approve & Write'; }
+      }
+    } catch (err) {
+      showToast('❌ Error', err.message);
+      const ab = body.querySelector('.synth-approve-btn');
+      if (ab) { ab.disabled = false; ab.textContent = '✅ Approve & Write'; }
+    }
+  }
+
+  // ── Spec card ─────────────────────────────────────────────────
+  function appendSpecCard(spec) {
+    const html = `
+      <div style="background:var(--bg-2);border:1px solid rgba(168,85,247,.3);border-radius:10px;padding:14px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:8px">📋 App Spec: ${escHtml(spec.title||spec.name)}</div>
+        <div style="font-size:12px;color:var(--text-2);line-height:1.8">
+          <div><strong style="color:var(--text-0)">Type:</strong> ${escHtml(spec.type||'')} · port ${spec.port||3000}</div>
+          <div><strong style="color:var(--text-0)">Tech:</strong> ${(spec.tech||[]).map(escHtml).join(', ')}</div>
+          <div><strong style="color:var(--text-0)">Files:</strong> ${(spec.files||[]).map(escHtml).join(', ')}</div>
+          ${spec.features ? `<div><strong style="color:var(--text-0)">Features:</strong> ${spec.features.map(escHtml).join(' · ')}</div>` : ''}
+        </div>
+        <div style="font-size:11px;color:var(--text-2);margin-top:8px">Spec designed — now I'll write the code and ask for your approval.</div>
+      </div>`;
+    appendMsg('assistant', html, true);
+  }
+
+  // ── Review card ───────────────────────────────────────────────
+  function appendReviewCard(review) {
+    const score = review.score || 0;
+    const color = score >= 80 ? 'var(--green)' : score >= 60 ? 'var(--yellow)' : 'var(--red)';
+    const issues = (review.issues || []).map(i =>
+      `<div class="synth-issue ${i.severity}" style="margin-bottom:4px">
+        <strong>${escHtml(i.severity?.toUpperCase()||'INFO')}</strong>
+        ${i.file ? `<code>${escHtml(i.file)}</code>` : ''}
+        ${escHtml(i.issue||'')}
+        ${i.fix ? `<div style="font-size:11px;color:var(--text-2);margin-top:2px">Fix: ${escHtml(i.fix)}</div>` : ''}
+      </div>`
+    ).join('');
+    const html = `
+      <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:10px;padding:14px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+          <span style="font-size:28px;font-weight:800;color:${color}">${score}/100</span>
+          <div>
+            <div style="font-size:13px;font-weight:600">Code Review</div>
+            <div style="font-size:12px;color:var(--text-2)">Verdict: <strong style="color:var(--text-0)">${escHtml(review.verdict||'?')}</strong></div>
+          </div>
+        </div>
+        ${issues}
+        ${(review.suggestions||[]).map(s => `<div style="font-size:12px;color:var(--teal);margin-top:4px">💡 ${escHtml(s)}</div>`).join('')}
+      </div>`;
+    appendMsg('assistant', html, true);
+  }
+
+  // ── Message helpers ───────────────────────────────────────────
+  function appendMsg(role, content, isHtml = false) {
+    const c = msgContainer(); if (!c) return null;
+    const div = document.createElement('div');
+    div.className = `message ${role}`;
+    div.innerHTML = `<div class="msg-avatar">${role==='user'?'👤':'🤖'}</div><div class="msg-content synth-body"></div>`;
+    const body = div.querySelector('.synth-body');
+    if (isHtml) body.innerHTML = content;
+    else body.textContent = content;
+    c.appendChild(div); c.scrollTop = c.scrollHeight;
+    return body;
+  }
+
+  function appendStreamingMsg(mode) {
+    const c = msgContainer(); if (!c) return null;
+    const div = document.createElement('div');
+    div.className = 'message assistant';
+    const modeTag = { builder:'🔨', architect:'🧠', editor:'🛠', reviewer:'🔬', pipeline:'🚀' }[mode] || '🤖';
+    div.innerHTML = `<div class="msg-avatar">🤖</div><div class="msg-content synth-body"><span style="color:var(--accent);font-size:11px">${modeTag} ${mode}</span><span class="synth-stream-body"></span></div>`;
+    c.appendChild(div); c.scrollTop = c.scrollHeight;
+    return div.querySelector('.synth-stream-body');
+  }
+
+  function appendToStream(el, text) {
+    if (!el) return;
+    el.textContent = (el.textContent || '') + text;
+    const c = msgContainer(); if (c) c.scrollTop = c.scrollHeight;
+  }
+
+  function escHtml(str) {
+    return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function escAttr(str) { return String(str || '').replace(/"/g,'&quot;'); }
+
+  // ── Connect when panel opens ──────────────────────────────────
+  const origSwitch = window.switchPanel;
+  window.switchPanel = function(panel) {
+    if (origSwitch) origSwitch(panel);
+    if (panel === 'synth') connectSynth();
+  };
+
+  // Auto-connect on init
+  connectSynth();
+  updateModeUI();
+})();
+
+// ============================================================
+// RESPONSIVE SIDEBAR — hamburger, backdrop, drawer
+// Copyright © 2026 SRL - S.R.Langlois
+// ============================================================
+
+(function initResponsiveSidebar() {
+  const hamburger = document.getElementById('hamburger-btn');
+  const sidebar   = document.getElementById('sidebar');
+  const backdrop  = document.getElementById('sidebar-backdrop');
+  const topbarTitle = document.getElementById('topbar-title');
+
+  if (!hamburger || !sidebar) return;
+
+  function openDrawer() {
+    sidebar.classList.add('open');
+    backdrop.classList.add('visible');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeDrawer() {
+    sidebar.classList.remove('open');
+    backdrop.classList.remove('visible');
+    document.body.style.overflow = '';
+  }
+
+  hamburger.addEventListener('click', () => {
+    sidebar.classList.contains('open') ? closeDrawer() : openDrawer();
+  });
+
+  backdrop.addEventListener('click', closeDrawer);
+
+  // Close drawer when a nav button is tapped (mobile UX)
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (window.innerWidth <= 768) closeDrawer();
+    });
+  });
+
+  // Update topbar panel title when switching panels
+  const origSwitch = window.switchPanel;
+  window.switchPanel = function(panel) {
+    if (origSwitch) origSwitch(panel);
+    const btn = document.querySelector(`.nav-btn[data-panel="${panel}"]`);
+    if (topbarTitle && btn) topbarTitle.textContent = btn.textContent.trim();
+  };
+
+  // Preview toggle on mobile
+  const togglePreviewBtn = document.getElementById('toggle-preview-btn');
+  if (togglePreviewBtn) {
+    togglePreviewBtn.addEventListener('click', () => {
+      const side = document.getElementById('preview-side');
+      if (!side) return;
+      if (window.innerWidth <= 768) {
+        side.classList.toggle('mobile-open');
+        togglePreviewBtn.textContent = side.classList.contains('mobile-open') ? '✕ Close Preview' : '👁 Preview';
+      }
+    });
+  }
+})();
+
+// ============================================================
+// DOWNLOAD + OFFLINE-SAFE TABS
+// Copyright © 2026 SRL - S.R.Langlois. All rights reserved.
+// ============================================================
+
+(function initDownloadAndTabs() {
+  'use strict';
+
+  // ── Helpers ────────────────────────────────────────────────────
+  function showDownloadToast(msg) {
+    let toast = document.getElementById('dl-toast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'dl-toast';
+      toast.className = 'download-toast';
+      toast.innerHTML = '<div class="dl-spinner"></div><span id="dl-toast-msg">Preparing...</span>';
+      document.body.appendChild(toast);
+    }
+    document.getElementById('dl-toast-msg').textContent = msg;
+    toast.classList.add('visible');
+    return toast;
+  }
+  function hideDownloadToast() {
+    const t = document.getElementById('dl-toast');
+    if (t) t.classList.remove('visible');
+  }
+
+  function triggerDownload(url, filename) {
+    const a = document.createElement('a');
+    a.href = url; a.download = filename || 'download';
+    document.body.appendChild(a); a.click();
+    setTimeout(() => document.body.removeChild(a), 200);
+  }
+
+  // ── 1. DOWNLOAD SAM'S BUILDER (the whole app as ZIP) ──────────
+  const dlBuilderBtn = document.getElementById('download-sams-builder-btn');
+  if (dlBuilderBtn) {
+    dlBuilderBtn.addEventListener('click', async () => {
+      const toast = showDownloadToast('📦 Packing Sam\'s Builder...');
+      try {
+        // Try the server ZIP endpoint first
+        const res = await fetch('/api/files/download-builder', { method: 'POST' });
+        if (res.ok) {
+          const blob = await res.blob();
+          const url  = URL.createObjectURL(blob);
+          triggerDownload(url, 'sams-builder.zip');
+          URL.revokeObjectURL(url);
+          hideDownloadToast();
+          showToast('✅ Downloaded!', 'sams-builder.zip');
+        } else {
+          throw new Error('Server endpoint unavailable');
+        }
+      } catch {
+        // Fallback: download the standalone HTML file instead
+        hideDownloadToast();
+        showToast('⬇ Downloading standalone HTML…', 'Full app in a single file');
+        // Build a self-contained snapshot from current page
+        const snapshot = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+        const blob = new Blob([snapshot], { type: 'text/html' });
+        const url  = URL.createObjectURL(blob);
+        triggerDownload(url, 'sams-builder.html');
+        URL.revokeObjectURL(url);
+      }
+    });
+  }
+
+  // ── 2. DOWNLOAD ACTIVE PROJECT (sidebar shortcut) ─────────────
+  const dlProjSidebarBtn = document.getElementById('download-active-project-sidebar-btn');
+  if (dlProjSidebarBtn) {
+    dlProjSidebarBtn.addEventListener('click', () => {
+      const proj = window.state?.activeProject || document.getElementById('active-project-name')?.textContent?.trim();
+      if (!proj) { showToast('⚠️', 'No project open. Open one from Projects.'); return; }
+      downloadProjectZip(proj);
+    });
+  }
+
+  // ── 3. DOWNLOAD PROJECT from Projects panel header ─────────────
+  const dlActiveProjBtn = document.getElementById('download-active-project-btn');
+  if (dlActiveProjBtn) {
+    dlActiveProjBtn.addEventListener('click', () => {
+      const proj = window.state?.activeProject;
+      if (!proj) { showToast('⚠️', 'No project selected. Click a project first.'); return; }
+      downloadProjectZip(proj);
+    });
+  }
+
+  // ── 4. DOWNLOAD PROJECT from Editor panel header ───────────────
+  const dlEditorProjBtn = document.getElementById('download-editor-project-btn');
+  if (dlEditorProjBtn) {
+    dlEditorProjBtn.addEventListener('click', () => {
+      const proj = window.state?.activeProject;
+      if (!proj) { showToast('⚠️', 'No project open in editor.'); return; }
+      downloadProjectZip(proj);
+    });
+  }
+
+  // Shared download function
+  async function downloadProjectZip(projectName) {
+    const toast = showDownloadToast(`⬇ Downloading ${projectName}...`);
+    try {
+      const res = await fetch(`/api/apps/${projectName}/download`);
+      if (!res.ok) throw new Error(`Server returned ${res.status}`);
+      const blob = await res.blob();
+      const url  = URL.createObjectURL(blob);
+      triggerDownload(url, `${projectName}.zip`);
+      URL.revokeObjectURL(url);
+      hideDownloadToast();
+      showToast('✅ Downloaded!', `${projectName}.zip`);
+    } catch (err) {
+      hideDownloadToast();
+      showToast('❌ Download failed', `${err.message} — is the server running?`);
+    }
+  }
+
+  // Make downloadProjectZip globally accessible (used by project cards)
+  window.downloadProject = downloadProjectZip;
+
+  // ── 5. Show/hide project download buttons based on active project ──
+  function onProjectChange(name) {
+    if (dlActiveProjBtn)      dlActiveProjBtn.style.display      = name ? 'inline-flex' : 'none';
+    if (dlEditorProjBtn)      dlEditorProjBtn.style.display      = name ? 'inline-flex' : 'none';
+    if (dlProjSidebarBtn)     dlProjSidebarBtn.style.display     = name ? 'block' : 'none';
+  }
+  // Watch activeProject changes
+  const origOpen = window.openProject;
+  window.openProject = function(n) {
+    if (origOpen) origOpen(n);
+    onProjectChange(n);
+  };
+
+  // ── 6. OFFLINE-SAFE TAB LOADING ────────────────────────────────
+  // Wrap all fetch-based loaders to show friendly offline state
+  function wrapLoader(fn, panelId, offlineLabel) {
+    return async function() {
+      try {
+        await fn();
+      } catch (err) {
+        const panel = document.getElementById(panelId);
+        const container = panel?.querySelector('[id$="-grid"],[id$="-content"],[id$="-output"],[id$="-stats"],[id$="-builds"]');
+        if (container) {
+          container.innerHTML = `
+            <div class="offline-panel">
+              <div class="offline-icon">🔌</div>
+              <h3>${offlineLabel} Offline</h3>
+              <p>The server isn't responding. Start Sam's Builder server to use this panel.</p>
+              <div class="offline-cmd-block">
+                <div class="cmd-label">Start the server</div>
+                <div class="cmd-line">cd sams-builder</div>
+                <div class="cmd-line">npm install</div>
+                <div class="cmd-line">npm start</div>
+                <div class="cmd-label" style="margin-top:8px">Then open</div>
+                <div class="cmd-line">http://localhost:3000</div>
+              </div>
+            </div>`;
+        }
+      }
+    };
+  }
+
+  // Override loadProjects with offline-safe version
+  const _loadProjectsOrig = window.loadProjects;
+  window.loadProjects = wrapLoader(
+    async () => {
+      const r = await fetch('/api/apps');
+      if (!r.ok) throw new Error('Server error');
+      const d = await r.json();
+      const g = document.getElementById('projects-grid');
+      if (!d.projects?.length) {
+        g.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><p>No projects yet.<br><span style="font-size:12px">Ask the AI to build something in Chat & Build.</span></p></div>`;
+        return;
+      }
+      g.innerHTML = d.projects.map(p => `
+        <div class="project-card">
+          <h3>📦 ${p.name}</h3>
+          <p>${p.description || 'Built with Sam\'s Builder'}</p>
+          <div class="project-actions">
+            <button class="btn-open" onclick="openProject('${p.name}')">📂 Open</button>
+            <button class="btn-sm" onclick="downloadProject('${p.name}')">⬇ ZIP</button>
+            <button class="btn-danger" onclick="deleteProject('${p.name}')">🗑 Delete</button>
+          </div>
+        </div>`).join('');
+    },
+    'panel-projects', 'Projects'
+  );
+
+  // Override loadMemory with offline-safe version
+  window.loadMemory = wrapLoader(
+    async () => {
+      const r = await fetch('/api/memory');
+      if (!r.ok) throw new Error('Server error');
+      const d = await r.json();
+      const stats = document.getElementById('memory-stats');
+      if (stats) stats.innerHTML = `
+        <div class="stat-row"><span>Total builds</span><strong>${d.totalBuilds||0}</strong></div>
+        <div class="stat-row"><span>Projects</span><strong>${d.totalProjects||0}</strong></div>
+        <div class="stat-row"><span>Patterns learned</span><strong>${d.patterns||0}</strong></div>
+        <div class="stat-row"><span>Music generated</span><strong>${d.assets?.music||0}</strong></div>
+        <div class="stat-row"><span>Images generated</span><strong>${d.assets?.images||0}</strong></div>
+        <div class="stat-row"><span>Videos generated</span><strong>${d.assets?.videos||0}</strong></div>`;
+      const builds = document.getElementById('memory-builds');
+      if (builds) builds.innerHTML = d.recentBuilds?.length
+        ? d.recentBuilds.map(b => `
+            <div class="memory-item">
+              <strong>${b.name}</strong>
+              <span>${b.type||''} · ${new Date(b.builtAt).toLocaleDateString()}</span>
+            </div>`).join('')
+        : '<p class="dim" style="padding:16px;color:var(--text-2)">No builds yet</p>';
+    },
+    'panel-memory', 'Memory'
+  );
+
+  // Override loadTools with offline-safe version
+  window.loadTools = wrapLoader(
+    async () => {
+      const r = await fetch('/api/tools');
+      if (!r.ok) throw new Error('Server error');
+      const d = await r.json();
+      const g = document.getElementById('tools-grid');
+      if (!g) return;
+      if (!d.tools?.length) {
+        g.innerHTML = `<div class="empty-state"><div class="empty-icon">🧰</div><p>No custom tools yet.<br><span style="font-size:12px">Ask the AI to build a tool.</span></p></div>`;
+        return;
+      }
+      g.innerHTML = d.tools.map(t => `
+        <div class="tool-card">
+          <h3>${t.name}</h3>
+          <p>${t.description||''}</p>
+          <span class="badge-pill" style="font-size:10px;margin-top:8px;display:inline-block">${t.type||'built-in'}</span>
+        </div>`).join('');
+    },
+    'panel-tools', 'Tools'
+  );
+
+  // ── 7. PANEL SWITCH — show download buttons contextually ───────
+  const origPanelSwitch = window.switchPanel;
+  window.switchPanel = function(panel) {
+    if (origPanelSwitch) origPanelSwitch(panel);
+
+    // Refresh data when switching to data panels
+    if (panel === 'projects') window.loadProjects();
+    if (panel === 'memory')   window.loadMemory();
+    if (panel === 'tools')    window.loadTools();
+
+    // Show project download in editor and projects panels
+    const hasProject = !!window.state?.activeProject;
+    if (dlActiveProjBtn) dlActiveProjBtn.style.display = (panel === 'projects' && hasProject) ? 'inline-flex' : 'none';
+    if (dlEditorProjBtn) dlEditorProjBtn.style.display = (panel === 'editor' && hasProject) ? 'inline-flex' : 'none';
+  };
+
+  // ── 8. AI STATUS CHECK — offline badge for all three services ──
+  async function checkAllStatus() {
+    const checks = [
+      { url: '/api/chat/health',    dot: 'ai-dot',     text: 'ai-text',     label: 'AI' },
+      { url: '/api/chat/health',    dot: 'vision-dot',  text: 'vision-text', label: 'Vision' },
+      { url: '/api/voice/status',   dot: 'voice-dot',  text: 'voice-text',  label: 'Voice' },
+    ];
+    for (const c of checks) {
+      try {
+        const r = await fetch(c.url, { signal: AbortSignal.timeout(3000) });
+        const d = await r.json();
+        const isOk = d.status === 'ok' || d.ollama || d.available;
+        const dot  = document.getElementById(c.dot);
+        const txt  = document.getElementById(c.text);
+        if (dot) { dot.className = `status-dot ${isOk ? 'online' : 'warn'}`; }
+        if (txt) { txt.textContent = isOk ? `${c.label} ready` : `${c.label} offline`; }
+      } catch {
+        const dot = document.getElementById(c.dot);
+        const txt = document.getElementById(c.text);
+        if (dot) dot.className = 'status-dot offline';
+        if (txt) txt.textContent = `${c.label} offline`;
+      }
+    }
+  }
+
+  // Initial check + repeat every 30s
+  checkAllStatus();
+  setInterval(checkAllStatus, 30000);
+
+  // ── 9. DOWNLOAD SERVER ENDPOINT (add if missing) ───────────────
+  // This just registers the route client-side note — server handles it
+  // The /api/files/download-builder route is added in the files route
+
+})();
+
+// ============================================================
+// SYNTH TARGET SELECTOR — fix builder AND workspace projects
+// Copyright © 2026 SRL - S.R.Langlois. All rights reserved.
+// ============================================================
+
+(function initSynthTargetSelector() {
+  'use strict';
+
+  // Inject target UI into the Synth sidebar (editor mode section)
+  const fileCtx = document.getElementById('synth-file-ctx');
+  if (!fileCtx) return;
+
+  // Add scope selector above file list
+  const scopeEl = document.createElement('div');
+  scopeEl.className = 'synth-sidebar-section';
+  scopeEl.style.cssText = 'display:none';
+  scopeEl.id = 'synth-scope-section';
+  scopeEl.innerHTML = `
+    <div class="synth-sidebar-label">Fix target</div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <label class="synth-scope-radio" id="scope-builder-lbl">
+        <input type="radio" name="synth-scope" value="builder" checked> 
+        <span>🛠 Sam's Builder</span>
+        <small>Fix the builder itself</small>
+      </label>
+      <label class="synth-scope-radio" id="scope-project-lbl">
+        <input type="radio" name="synth-scope" value="project">
+        <span>📦 My App</span>
+        <small>Fix an app I built</small>
+      </label>
+    </div>
+    <div id="synth-project-picker" style="margin-top:10px;display:none">
+      <div class="synth-sidebar-label">Select project</div>
+      <select id="synth-target-project" class="synth-mode-dropdown" style="width:100%">
+        <option value="">Loading projects...</option>
+      </select>
+    </div>
+  `;
+  fileCtx.insertBefore(scopeEl, fileCtx.firstChild);
+
+  // CSS for scope radios
+  const style = document.createElement('style');
+  style.textContent = `
+    .synth-scope-radio {
+      display:flex;align-items:flex-start;gap:8px;padding:8px 10px;
+      background:var(--bg-2);border:1px solid var(--border);border-radius:8px;
+      cursor:pointer;transition:all .12s;font-size:13px;
+    }
+    .synth-scope-radio:has(input:checked) {
+      border-color:var(--accent);background:rgba(168,85,247,.06);
+    }
+    .synth-scope-radio span { font-weight:600;color:var(--text-0); }
+    .synth-scope-radio small { display:block;font-size:11px;color:var(--text-2);margin-top:1px; }
+    .synth-scope-radio input { margin-top:3px;accent-color:var(--accent);flex-shrink:0; }
+    .synth-file-scope-tag {
+      font-size:9px;padding:1px 5px;border-radius:4px;margin-left:4px;
+      vertical-align:middle;font-weight:600;letter-spacing:.3px;
+    }
+    .scope-builder { background:rgba(168,85,247,.15);color:var(--accent); }
+    .scope-project { background:rgba(34,197,94,.12);color:var(--green); }
+    .synth-file-group-label.scope-project { color:var(--green); }
+  `;
+  document.head.appendChild(style);
+
+  let currentScope   = 'builder';
+  let currentProject = '';
+
+  // Show scope section when editor mode is active
+  const origUpdateModeUI = window._synthUpdateModeUI;
+  // Hook into mode changes by watching the mode select
+  const modeSelect = document.getElementById('synth-mode-select');
+  if (modeSelect) {
+    modeSelect.addEventListener('change', () => {
+      const isEditor = modeSelect.value === 'editor';
+      if (scopeEl) scopeEl.style.display = isEditor ? 'block' : 'none';
+      if (isEditor) loadProjectList();
+    });
+  }
+
+  // Radio toggle
+  document.querySelectorAll('input[name="synth-scope"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      currentScope = radio.value;
+      const picker = document.getElementById('synth-project-picker');
+      if (picker) picker.style.display = currentScope === 'project' ? 'block' : 'none';
+      if (currentScope === 'project' && currentProject) {
+        loadFileListForProject(currentProject);
+      } else {
+        loadFileListForProject(null); // builder only
+      }
+    });
+  });
+
+  // Project dropdown change
+  const projSelect = document.getElementById('synth-target-project');
+  if (projSelect) {
+    projSelect.addEventListener('change', () => {
+      currentProject = projSelect.value;
+      if (currentProject) loadFileListForProject(currentProject);
+    });
+  }
+
+  // Load workspace project list into dropdown
+  async function loadProjectList() {
+    try {
+      const res  = await fetch('/api/synth/projects');
+      const data = await res.json();
+      const sel  = document.getElementById('synth-target-project');
+      if (!sel) return;
+      if (!data.projects?.length) {
+        sel.innerHTML = '<option value="">No projects yet — build one first</option>';
+        return;
+      }
+      sel.innerHTML = '<option value="">— pick a project —</option>' +
+        data.projects.map(p => `<option value="${p.name}">${p.name}</option>`).join('');
+    } catch {
+      const sel = document.getElementById('synth-target-project');
+      if (sel) sel.innerHTML = '<option value="">Server offline</option>';
+    }
+  }
+
+  // Load file list — builder only (null) or builder + project
+  async function loadFileListForProject(projectName) {
+    const list = document.getElementById('synth-file-list');
+    if (!list) return;
+    list.innerHTML = '<div style="padding:8px;font-size:11px;color:var(--text-2)">Loading...</div>';
+    try {
+      const url  = projectName ? `/api/synth/editor/files?project=${encodeURIComponent(projectName)}` : '/api/synth/editor/files';
+      const res  = await fetch(url);
+      const data = await res.json();
+
+      // Group by scope then dir
+      const builderFiles = (data.files||[]).filter(f => f.scope === 'builder');
+      const projectFiles = (data.files||[]).filter(f => f.scope === 'project');
+
+      const renderGroup = (label, files, scopeClass) => {
+        if (!files.length) return '';
+        const byDir = {};
+        files.forEach(f => { (byDir[f.dir]||(byDir[f.dir]=[])).push(f); });
+        return `<div class="synth-file-group-label ${scopeClass}">${label}</div>` +
+          Object.entries(byDir).map(([dir, fs]) =>
+            `<div class="synth-file-group-label" style="font-size:9px;padding:4px 12px 2px;color:var(--text-2)">${dir}</div>` +
+            fs.map(f => `
+              <div class="synth-file-item-v2" data-path="${f.path}" data-project="${projectName||''}" title="${f.path}">
+                ${f.name}
+                <span class="synth-file-scope-tag ${scopeClass}">${scopeClass === 'scope-project' ? 'APP' : 'SYS'}</span>
+              </div>`).join('')
+          ).join('');
+      };
+
+      list.innerHTML =
+        renderGroup("🛠 Sam's Builder", builderFiles, 'scope-builder') +
+        (projectFiles.length ? renderGroup(`📦 ${projectName}`, projectFiles, 'scope-project') : '');
+
+      list.querySelectorAll('.synth-file-item-v2').forEach(item => {
+        item.addEventListener('click', () => {
+          document.querySelectorAll('.synth-file-item-v2').forEach(i => i.classList.remove('active'));
+          item.classList.add('active');
+          openSynthFile(item.dataset.path, item.dataset.project, item);
+        });
+      });
+    } catch {
+      list.innerHTML = '<div style="padding:8px;font-size:11px;color:var(--red)">Server offline — start the server first</div>';
+    }
+  }
+
+  // Open a file (handles both builder and workspace paths)
+  async function openSynthFile(filePath, projectName, itemEl) {
+    const strip   = document.getElementById('synth-file-strip');
+    const editor  = document.getElementById('synth-file-editor');
+    const nameEl  = document.getElementById('synth-strip-filename');
+    const saveBtn = document.getElementById('synth-strip-save-btn');
+
+    try {
+      const url  = `/api/synth/editor/file?filePath=${encodeURIComponent(filePath)}` +
+                   (projectName ? `&project=${encodeURIComponent(projectName)}` : '');
+      const res  = await fetch(url);
+      const data = await res.json();
+      if (editor) editor.value = data.content || '';
+      if (nameEl) {
+        const scope = data.scope === 'project' ? '📦' : '🛠';
+        nameEl.textContent = `${scope} ${filePath}`;
+      }
+      if (strip) strip.style.display = 'flex';
+      if (saveBtn) { saveBtn.style.display = 'inline-block'; saveBtn.dataset.filePath = filePath; saveBtn.dataset.project = projectName || ''; }
+
+      // Store for "Ask Synth about this" button
+      window._synthOpenFile    = filePath;
+      window._synthOpenProject = projectName;
+
+      // Update save button handler
+      saveBtn.onclick = async () => {
+        const content = editor?.value || '';
+        try {
+          const r = await fetch('/api/synth/editor/write', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filePath, content, reason: 'Manual edit in Synth editor', project: projectName || '' })
+          });
+          const d = await r.json();
+          if (typeof showToast === 'function') showToast(d.success ? '💾 Saved' : '❌ Failed', filePath + (d.restart ? ' — restart server' : ''));
+        } catch (err) { if (typeof showToast === 'function') showToast('❌', err.message); }
+      };
+    } catch (err) {
+      if (typeof showToast === 'function') showToast('❌', `Can't read ${filePath}: ${err.message}`);
+    }
+  }
+
+  // Override the "Ask Synth about this" button to inject project context
+  const askBtn = document.getElementById('synth-strip-ask-btn');
+  if (askBtn) {
+    askBtn.addEventListener('click', () => {
+      const fp   = window._synthOpenFile    || '';
+      const proj = window._synthOpenProject || '';
+      const inp  = document.getElementById('synth-input');
+      if (inp) {
+        inp.value = proj
+          ? `In my app "${proj}", look at ${fp} and fix any bugs or issues you find.`
+          : `Analyze ${fp} in Sam's Builder and fix any bugs or improvements needed.`;
+        inp.focus();
+      }
+    });
+  }
+
+  // Expose for mode UI to call
+  window._loadSynthFileList = loadFileListForProject;
+  window._loadSynthProjects = loadProjectList;
+
+})();
+
+
+// SAM'S STUDIO SPLASH AUTO-HIDE — © 2026 SRL - S.R.Langlois
+document.addEventListener('DOMContentLoaded', () => {
+  const splash = document.getElementById('srl-splash');
+  if(splash){
+    setTimeout(() => splash.classList.add('hidden'), 2200);
+  }
+});
+
+</script>
 </body>
 </html>
